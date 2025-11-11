@@ -8,6 +8,7 @@ import Register from "./pages/Register.jsx";
 import DashboardLayout from "./layouts/DashboardLayout.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Plants from "./pages/Plants.jsx";
+import Profile from "./pages/Profile.jsx";
 import PlantDetail from "./pages/PlantDetail.jsx";
 import Monitoring from "./pages/Monitoring.jsx";
 import Report from "./pages/Report.jsx";
@@ -35,6 +36,7 @@ const router = createBrowserRouter([
         { path: "plants/:id", element: <PlantDetail /> },
          { path: "monitoring", element: <Monitoring /> }, 
          { path: "report", element: <Report /> },
+         { path: "profile", element: <Profile /> },
     ],
   },
 
