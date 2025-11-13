@@ -1,8 +1,7 @@
-import { useState, useRef } from "react";
-import { addPlant } from "../lib/plantStorage";
+import { useState, useRef, useEffect } from "react";
 import { FaTimes, FaCalendarAlt, FaChevronDown, FaFolderOpen } from "react-icons/fa";
 
-export default function AddPlantModal({ onClose }) {
+export default function EditPlantModal({ onClose, onSave, initialData }) {
   const [form, setForm] = useState({
     type: "",
     date: "",
@@ -13,6 +12,19 @@ export default function AddPlantModal({ onClose }) {
   const fileRef = useRef(null);
   const dateRef = useRef(null);
 
+  useEffect(() => {
+    if (initialData) {
+      setForm((s) => ({
+        ...s,
+        type: initialData.type || "",
+        date: initialData.date || "",
+        period: initialData.period || "",
+        code: initialData.code || "",
+        photo: null,
+      }));
+    }
+  }, [initialData]);
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     setForm((s) => ({ ...s, [name]: files ? files[0] : value }));
@@ -20,37 +32,23 @@ export default function AddPlantModal({ onClose }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      addPlant({
-        code: form.code,
-        type: form.type,
-        date: form.date,
-        period: form.period,
-        // defaults for demo
-        health: "Sehat",
-        phase: "Fase Berbuah",
-      });
-      alert("Tanaman ditambahkan!");
-    } catch (err) {
-      console.error("Failed to add plant:", err);
-      alert("Gagal menambahkan tanaman.");
-    }
+    onSave?.(form);
     onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-2xl relative">
+      <div className="relative w-full max-w-lg rounded-xl bg-white p-6 shadow-2xl">
         {/* Close */}
         <button
           className="absolute right-3 top-3 text-gray-500 hover:text-gray-800"
           onClick={onClose}
-          aria-label="Close"
+          aria-label="Tutup"
         >
           <FaTimes size={18} />
         </button>
 
-        <h2 className="mb-4 text-lg font-semibold">Tambah tanaman</h2>
+        <h2 className="mb-4 text-lg font-semibold">Edit Tanaman</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Jenis Alpukat */}
@@ -81,6 +79,7 @@ export default function AddPlantModal({ onClose }) {
                 name="date"
                 value={form.date}
                 onChange={handleChange}
+                placeholder="DD/MM/YY"
                 className="w-full rounded-md border px-3 py-2 pr-9 focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none no-native-date-icon"
               />
               <button
@@ -94,11 +93,8 @@ export default function AddPlantModal({ onClose }) {
                     el.showPicker();
                   } else {
                     el.focus();
-                    try {
-                      el.click();
-                    } catch (err) {
-                      console.warn(err);
-                    }
+                    // Fallback: trigger a click to hint some browsers
+                    try { el.click(); } catch (e) { console.debug("Date input click fallback failed", e); }
                   }
                 }}
               >
@@ -153,16 +149,16 @@ export default function AddPlantModal({ onClose }) {
                 onClick={() => fileRef.current?.click()}
                 className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
               >
-                Buka File
+                Buka Folder
               </button>
               {form.photo && (
-                <p className="mt-2 text-xs text-gray-600 truncate">{form.photo.name}</p>
+                <p className="mt-2 truncate text-xs text-gray-600">{form.photo.name}</p>
               )}
             </div>
           </div>
 
           {/* Actions */}
-          <div className="mt-2 flex justify-between sm:justify-end gap-3">
+          <div className="mt-2 flex justify-between gap-3 sm:justify-end">
             <button
               type="button"
               onClick={onClose}
@@ -174,7 +170,7 @@ export default function AddPlantModal({ onClose }) {
               type="submit"
               className="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700"
             >
-              Tambahkan
+              Simpan
             </button>
           </div>
         </form>

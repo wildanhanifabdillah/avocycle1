@@ -1,9 +1,9 @@
 
 @import "tailwindcss";
 
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; */
 
 /* Base kecil untuk font & smoothing */
 :root {
@@ -14,4 +14,14 @@ html, body, #root { height: 100%; }
 body {
   @apply bg-gradient-to-b from-[#d7ffce] to-[#fafff6] text-gray-800;
   font-family: 'Poppins', sans-serif;
+}
+
+/* Hide native date input calendar icon when we provide our own trigger */
+.no-native-date-icon::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  display: none;
+}
+.no-native-date-icon::-moz-calendar-picker-indicator {
+  opacity: 0;
+  display: none;
 }
