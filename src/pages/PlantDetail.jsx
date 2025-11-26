@@ -231,7 +231,7 @@ export default function PlantDetail() {
       <div className="bg-white rounded-xl shadow-md p-6 border">
         <h3 className="font-semibold mb-4 text-gray-700">Siklus Pertumbuhan</h3>
         <div className="relative">
-          <div ref={lineAreaRef} className="absolute left-8 right-8 top-4 h-[2px]">
+          <div ref={lineAreaRef} className="absolute left-8 right-8 top-4 h-0.5">
             <div className="absolute inset-0 bg-gray-300" /> 
             <div className="absolute inset-0 bg-green-500" style={{ width: `${progressPx}px` }} />
           </div>
