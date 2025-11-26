@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FaEdit, FaSyringe } from "react-icons/fa";
-import EditFaseBerbungaModal from "./EditFaseBerbungaModal";
-import EditFaseBerbuahModal from "./EditFaseBerbuahModal";
-import EditPlantModal from "./EditPlantModal";
+import EditFaseBerbungaModal from "./Modals/EditFaseBerbungaModal";
+import EditFaseBerbuahModal from "./Modals/EditFaseBerbuahModal";
+import EditPlantModal from "./Modals/EditPlantModal";
 import { loadPhases, savePhases } from "../lib/phaseStorage";
 
 export default function PlantDetail() {
@@ -51,6 +51,43 @@ export default function PlantDetail() {
     const yyyy = date.getFullYear();
     return `${dd}/${mm}/${yyyy}`;
   };
+  const toDMY = (input) => {
+    if (!input) return "-";
+
+    // Jika sudah format dd/mm/yyyy -> langsung return
+    if (input.includes("/")) return input;
+
+    // Map bulan Indonesia
+    const bulan = {
+      januari: 0,
+      februari: 1,
+      maret: 2,
+      april: 3,
+      mei: 4,
+      juni: 5,
+      juli: 6,
+      agustus: 7,
+      september: 8,
+      oktober: 9,
+      november: 10,
+      desember: 11
+    };
+
+    // Cek format "2 Oktober 2023"
+    const bagian = input.toLowerCase().split(" ");
+    if (bagian.length === 3) {
+      const [d, m, y] = bagian;
+      const bulanIndex = bulan[m];
+      if (bulanIndex !== undefined) {
+        const date = new Date(Number(y), bulanIndex, Number(d));
+        if (!isNaN(date)) return fmtDMY(date);
+      }
+    }
+
+    return input; // fallback
+  };
+
+
 
   // Selectors (latest entry per phase)
   const faseBerbungaData = useMemo(
@@ -143,43 +180,60 @@ export default function PlantDetail() {
 
   return (
     <div className="space-y-6">
-      {/* Header Info */}
-      <div className="bg-white rounded-xl shadow-md p-6 flex justify-between items-center">
-        <div className="flex items-center gap-4">
-          <img
-            src={plant.image}
-            alt={plant.code}
-            className="w-24 h-24 rounded-lg object-cover"
-          />
-          <div>
+    {/* Header Info */}
+    <div className="bg-white rounded-xl shadow-md p-6 flex items-start justify-between">
+      
+      {/* Kiri: Foto + Info */}
+      <div className="flex items-start gap-4">
+        <img
+          src={plant.image}
+          alt={plant.code}
+          className="w-24 h-24 rounded-lg object-cover"
+        />
+
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-3">
             <h2 className="text-xl font-semibold">{plant.code}</h2>
-            <p className="text-sm text-gray-600">
-              Tanggal Tanam: {plant.date}
-            </p>
-            <p className="text-sm text-gray-600">Usia: {plant.age}</p>
-            <p className="text-sm text-gray-600">
-              Status Kesehatan:{" "}
-              <span className="text-green-700 font-medium">
-                {plant.health}
-              </span>
-            </p>
+            <span
+              className={`px-3 py-0.5 rounded-full text-xs font-medium 
+                ${
+                  plant.health === "Sakit"
+                    ? "border border-red-500 text-red-500"
+                    : "border border-green-500 text-green-600"
+                }
+              `}
+            >
+              {plant.health || "Sehat"}
+            </span>
           </div>
+
+          <p className="text-sm text-gray-700">Jenis: {plant.type}</p>
+          <p className="text-sm text-gray-700">Usia: {plant.age}</p>
+          <p className="text-sm text-gray-700">Tanggal Tanam: {toDMY(plant.date)}</p>
+          <p className="text-sm text-gray-700">
+            Estimasi Panen: {faseBerbuahData?.estimasi || "-"}
+          </p>
         </div>
-        <button
-          onClick={() => setOpenEditPlant(true)}
-          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow"
-        >
-          <FaEdit /> Edit Data
-        </button>
       </div>
+
+      {/* Kanan: Tombol Edit */}
+      <button
+        onClick={() => setOpenEditPlant(true)}
+        className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow"
+      >
+        <FaEdit /> Edit Data
+      </button>
+
+    </div>
+
 
       {/* Siklus Pertumbuhan */}
       <div className="bg-white rounded-xl shadow-md p-6 border">
         <h3 className="font-semibold mb-4 text-gray-700">Siklus Pertumbuhan</h3>
         <div className="relative">
-          <div ref={lineAreaRef} className="absolute left-8 right-8 top-4">
-            <div className="h-[2px] bg-gray-300 w-full" />
-            <div className="h-[2px] bg-green-500" style={{ width: `${progressPx}px` }} />
+          <div ref={lineAreaRef} className="absolute left-8 right-8 top-4 h-[2px]">
+            <div className="absolute inset-0 bg-gray-300" /> 
+            <div className="absolute inset-0 bg-green-500" style={{ width: `${progressPx}px` }} />
           </div>
           <ol className="flex justify-between">
             {plant.stages.map((s, i) => {
@@ -264,26 +318,33 @@ export default function PlantDetail() {
                     {phases.berbunga.length === 0 ? (
                       <p className="text-sm text-gray-500 italic">Belum ada data.</p>
                     ) : (
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="text-left text-gray-700">
-                            <th className="py-2 px-3">Tanggal</th>
-                            <th className="py-2 px-3">Muncul Bunga</th>
-                            <th className="py-2 px-3">Pecah Bunga</th>
-                            <th className="py-2 px-3">Pentil Pertama</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {phases.berbunga.map((row, i) => (
-                            <tr key={i} className="border-t border-gray-300">
-                              <td className="py-3 px-3">{row.date || "-"}</td>
-                              <td className="py-3 px-3">{row.munculBunga || "-"}</td>
-                              <td className="py-3 px-3">{row.pecahBunga || "-"}</td>
-                              <td className="py-3 px-3">{row.pentilPertama || "-"}</td>
+                      <><table className="w-full text-sm">
+                          <thead>
+                            <tr className="text-left text-gray-700">
+                              <th className="py-2 px-3">Tanggal</th>
+                              <th className="py-2 px-3">Muncul Bunga</th>
+                              <th className="py-2 px-3">Pecah Bunga</th>
+                              <th className="py-2 px-3">Pentil Pertama</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody>
+                            {phases.berbunga.map((row, i) => (
+                              <tr key={i} className="border-t border-gray-300">
+                                <td className="py-3 px-3">{row.date || "-"}</td>
+                                <td className="py-3 px-3">{row.munculBunga || "-"}</td>
+                                <td className="py-3 px-3">{row.pecahBunga || "-"}</td>
+                                <td className="py-3 px-3">{row.pentilPertama || "-"}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table><div className="flex items-center justify-center gap-2 mt-3 text-sm">
+                            <button className="px-2 py-1 ">&lt;</button>
+                            <button className="px-3 py-1 bg-green-600 text-white rounded">1</button>
+                            <button className="px-2 py-1 ">2</button>
+                            <span>3</span>
+                            <span>…</span>
+                            <button className="px-2 py-1 ">&gt;</button>
+                          </div></>
                     )}
                   </div>
                 )}
@@ -327,12 +388,12 @@ export default function PlantDetail() {
                         </table>
 
                         <div className="flex items-center justify-center gap-2 mt-3 text-sm">
-                          <button className="px-2 py-1 border rounded">&lt;</button>
+                          <button className="px-2 py-1 ">&lt;</button>
                           <button className="px-3 py-1 bg-green-600 text-white rounded">1</button>
-                          <button className="px-2 py-1 border rounded">2</button>
+                          <button className="px-2 py-1 ">2</button>
                           <span>3</span>
                           <span>…</span>
-                          <button className="px-2 py-1 border rounded">&gt;</button>
+                          <button className="px-2 py-1 ">&gt;</button>
                         </div>
                       </>
                     )}
@@ -379,12 +440,12 @@ export default function PlantDetail() {
                         </table>
 
                         <div className="flex items-center justify-center gap-2 mt-3 text-sm">
-                          <button className="px-2 py-1 border rounded">&lt;</button>
+                          <button className="px-2 py-1">&lt;</button>
                           <button className="px-3 py-1 bg-green-600 text-white rounded">1</button>
-                          <button className="px-2 py-1 border rounded">2</button>
+                          <button className="px-2 py-1">2</button>
                           <span>3</span>
                           <span>…</span>
-                          <button className="px-2 py-1 border rounded">&gt;</button>
+                          <button className="px-2 py-1">&gt;</button>
                         </div>
                       </>
                     )}
@@ -425,6 +486,7 @@ export default function PlantDetail() {
           </button>
         </div>
       </div>
+      
       <EditFaseBerbungaModal
         open={openFlowerModal}
         onClose={() => setOpenFlowerModal(false)}

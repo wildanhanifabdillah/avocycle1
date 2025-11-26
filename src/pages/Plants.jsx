@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import AddPlantModal from "./AddPlantModal";
+import EditPlantModal from "./Modals/EditPlantModal";
+import AddPlantModal from "./Modals/AddPlantModal";
 import { Link } from "react-router-dom";
 import { FaEdit, FaPlus, FaCalendarAlt, FaChartBar } from "react-icons/fa";
 import { loadPlants } from "../lib/plantStorage";
@@ -7,6 +8,8 @@ import { loadPhases } from "../lib/phaseStorage";
 
 export default function Plants() {
   const [openModal, setOpenModal] = useState(false);
+  const [openEditPlant, setOpenEditPlant] = useState(false);
+  const [selectedPlant, setSelectedPlant] = useState(null);
   const [saved, setSaved] = useState([]);
   const [phaseTick, setPhaseTick] = useState(0);
   const [page, setPage] = useState(1);
@@ -81,6 +84,9 @@ export default function Plants() {
 
   // Derive phase label from stored phases per plant id
   const phasesMap = useMemo(() => {
+    // gunakan phaseTick supaya dianggap dependency yang valid
+    void phaseTick;
+
     const map = {};
     [...plants].forEach((p) => {
       try {
@@ -94,6 +100,7 @@ export default function Plants() {
     });
     return map;
   }, [plants, phaseTick]);
+
 
   return (
     <div className="relative">
@@ -117,17 +124,25 @@ export default function Plants() {
                     {plant.health || "Sehat"}
                   </span>
                 </div>
-                <div className="flex items-center gap-6 text-sm text-gray-600">
+                <div className="flex items-center gap-6 text-sm text-[#8C8C8C]">
                   <span className="inline-flex items-center gap-2">
-                    <FaCalendarAlt className="text-green-600" />
+                    <img
+                      src="/icons/calendar.svg"
+                      alt="calendar"
+                      className="w-5 h-5"
+                    />
                     {monthsDiffFrom(plant.date)} bulan
                   </span>
                   <span className="inline-flex items-center gap-2">
-                    <FaChartBar className="text-green-600" />
+                    <img
+                      src="/icons/growth.svg"
+                      alt="growth"
+                      className="w-5 h-5"
+                    />
                     {phasesMap[plant.id] || plant.phase || "Fase Berbuah"}
                   </span>
                 </div>
-                <div className="mt-1 text-sm">
+                <div className="mt-1 text-sm text-[#8C8C8C]">
                   <p>Jenis: {plant.type === "mentega" ? "Alpukat Mentega" : plant.type === "miki" ? "Alpukat Miki" : "-"}</p>
                   <p>Tanggal Tanam: {formatDMY(plant.date)}</p>
                   <p>
@@ -136,10 +151,18 @@ export default function Plants() {
                 </div>
               </div>
             </div>
-
-            <div className="flex flex-col items-end">
-              <FaEdit className="text-gray-400 hover:text-green-600 cursor-pointer mb-2" />
-              <Link to={`/dashboard/plants/${plant.id}`} className="bg-green-600 text-white px-4 py-1 rounded-lg hover:bg-green-700 transition shadow text-sm">
+            <div className="flex flex-col h-full items-end justify-between py-1">
+              <FaEdit
+                className="text-gray-400 hover:text-green-600 cursor-pointer"
+                onClick={() => {
+                  setSelectedPlant(plant);
+                  setOpenEditPlant(true);
+                }}
+              />
+              <Link
+                to={`/dashboard/plants/${plant.id}`}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition shadow text-sm mt-auto"
+              >
                 Lihat Detail
               </Link>
             </div>
@@ -191,6 +214,13 @@ export default function Plants() {
       >
         <FaPlus size={22} />
       </button>
+
+      {openEditPlant && (
+        <EditPlantModal
+          initialData={selectedPlant}
+          onClose={() => setOpenEditPlant(false)}
+        />
+      )}
 
       {openModal && <AddPlantModal onClose={() => setOpenModal(false)} />}
     </div>
