@@ -1,7 +1,17 @@
 import { Outlet } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 export default function App() {
   return (
+    // <>
+    //   {/* Toast notifications */}
+    //   <Toaster
+    //     position="top-right"
+    //     toastOptions={{
+    //       duration: Infinity,
+    //       style: { fontSize: "14px" }
+    //     }}
+    //   />
     <div className="min-h-screen w-full flex">
       {/* Panel kiri: gradient hijau + konten form */}
       <div
@@ -22,5 +32,6 @@ export default function App() {
         aria-hidden="true"
       />
     </div>
+    // </>
   );
 }

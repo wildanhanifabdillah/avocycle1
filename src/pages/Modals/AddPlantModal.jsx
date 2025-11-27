@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { addPlant } from "../../lib/plantStorage";
+import { addPlant } from "../../helpers/plantStorage";
 import { FaTimes, FaCalendarAlt, FaChevronDown, FaFolderOpen } from "react-icons/fa";
 
 export default function AddPlantModal({ onClose }) {

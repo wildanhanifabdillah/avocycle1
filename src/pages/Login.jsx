@@ -1,63 +1,83 @@
-import { Link, useNavigate } from "react-router-dom";
-import Brand from "../components/Brand.jsx";
-import Field, { Label } from "../components/Field.jsx";
-import Divider from "../components/Divider.jsx";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
+import { ENDPOINTS } from "../api/endpoints";
+import Brand from "../components/Brand";
+import Field, { Label } from "../components/Field";
+import Button from "../components/Button";
+import Divider from "../components/Divider";
 import { FcGoogle } from "react-icons/fc";
-import Button from "../components/Button.jsx";
 
 export default function Login() {
-
   const navigate = useNavigate();
-  const handleSubmit = (e) => {
+  const { login, loading } = useAuth();
+  const [form, setForm] = useState({ email: "", password: "" });  
+
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-     navigate("/dashboard"); // 🔹 arahkan ke halaman dashboard
-  };
+    const res = await login(form.email, form.password);
+
+    if (res.success) {
+      navigate("/dashboard");
+    } else {
+      alert(res.error || "Login gagal");
+  }
+}
+
   return (
     <div>
       <Brand />
 
-      <h1 className="text-[40px] leading-none sm:text-5xl font-extrabold mb-8">Sign in</h1>
+      <h1 className="text-4xl font-extrabold mb-8">Sign in</h1>
 
-       <form onSubmit={handleSubmit} className="max-w-xl">
+      <form onSubmit={handleSubmit} className="max-w-xl">
         <div className="mb-5">
-          <Label htmlFor="email">E-mail</Label>
+          <Label>Email</Label>
           <Field
-            id="email"
             type="email"
             placeholder="example@gmail.com"
-            autoComplete="email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
           />
         </div>
 
         <div className="mb-7">
-          <Label htmlFor="password">Password</Label>
+          <Label>Password</Label>
           <Field
-            id="password"
             type="password"
             placeholder="Password"
-            autoComplete="current-password"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
           />
         </div>
 
-        {/* tombol sign in */}
-        <Button type="submit">Sign in</Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? "Loading..." : "Sign in"}
+        </Button>
 
         <Divider label="OR" />
 
-        {/* tombol sign in google */}
-        <Button>
+        {/* GOOGLE LOGIN */}
+        <Button
+          type="button"
+          onClick={() =>
+            (window.location.href =
+              "http://localhost:2005/api/v1" + ENDPOINTS.GOOGLE_PETANI)
+          }
+        >
           <FcGoogle size={24} />
           <span>Sign in with Google</span>
         </Button>
 
-
+        {/* Register + Forgot Password */}
         <div className="mt-6 flex items-center justify-between text-sm">
-          <Link to="#" className="text-brand-700 hover:underline">
+          <a href="#" className="text-brand-700 hover:underline">
             Forgot Password?
-          </Link>
-          <Link to="/register" className="text-brand-700 hover:underline">
+          </a>
+          <a href="/register" className="text-brand-700 hover:underline">
             Register
-          </Link>
+          </a>
         </div>
       </form>
     </div>

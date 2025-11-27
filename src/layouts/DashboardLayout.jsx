@@ -7,7 +7,7 @@ export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
-    <div className="flex h-screen bg-gradient-to-b from-[#e4ffe0] to-[#ffffff]">
+    <div className="flex h-screen bg-linear-to-b from-[#e4ffe0] to-[#ffffff]">
       {/* Sidebar */}
       <Sidebar open={sidebarOpen} />
 
@@ -21,7 +21,7 @@ export default function DashboardLayout() {
         <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
         {/* Konten halaman */}
-        <main className="p-6 pt-[80px] overflow-y-auto">
+        <main className="p-6 pt-20 overflow-y-auto">
           <Outlet />
         </main>
       </div>

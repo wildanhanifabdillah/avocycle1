@@ -7,7 +7,9 @@ export default function Monitoring() {
     deskripsi: "",
   });
 
-  const [hasil, setHasil] = useState({
+  const [hasil, 
+    // setHasil
+  ] = useState({
     tanggal: "24/10/2025",
     kode: "AV001",
     penyakit: "Antraknosa",
