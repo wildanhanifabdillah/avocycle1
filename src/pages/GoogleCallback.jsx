@@ -7,19 +7,25 @@ export default function GoogleCallback() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
-    const name = params.get("name");
+    const name = params.get("name") || params.get("fullname");
     const email = params.get("email");
+    const role =
+      params.get("role") ||
+      sessionStorage.getItem("google_role") ||
+      null;
 
-    if (token) {
+    if (token && email) {
       localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify({ fullName: name, email }));
-
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ fullName: name, email, role })
+      );
+      sessionStorage.removeItem("google_role");
       navigate("/dashboard");
     } else {
       navigate("/login");
     }
-  }, 
-);
+  }, [navigate]);
 
   return <p className="mt-10 text-center">Memproses login Google...</p>;
 }
