@@ -1,5 +1,7 @@
 import React, { useState, useRef } from "react";
 import { FaEdit } from "react-icons/fa";
+import useAuth from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +18,10 @@ const Profile = () => {
   const [showSaved, setShowSaved] = useState(false);
   const [showLogout, setShowLogout] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
 
   // ketika isi form diubah
   const handleChange = (e) => {
@@ -31,8 +37,9 @@ const Profile = () => {
 
   // tombol logout
   const handleLogout = () => {
+    logout(); // hapus token + user
     setShowLogout(false);
-    console.log("User logged out");
+    navigate("/"); // redirect ke login
   };
 
   // tombol hapus akun
@@ -56,7 +63,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-lime-100 to-green-200 flex flex-col items-center p-8">
+    <div className="min-h-screen bg-linear-to-b from-lime-100 to-green-200 flex flex-col items-center p-8">
       {/* Header */}
       <div className="w-full flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-green-800">AVOCYCLE</h1>

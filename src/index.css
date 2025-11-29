@@ -1,22 +1,22 @@
-
 @import "tailwindcss";
-
-/* @tailwind base;
-@tailwind components;
-@tailwind utilities; */
 
 /* Base kecil untuk font & smoothing */
 :root {
-  --bg-grad-from: #eaffd8; /* hijau muda pucat */
-  --bg-grad-to: #c7f1b8;   /* hijau muda */
+  --bg-grad-from: #eaffd8;
+  --bg-grad-to: #c7f1b8;
 }
-html, body, #root { height: 100%; }
+
+html, body, #root {
+  height: 100%;
+}
+
 body {
-  @apply bg-gradient-to-b from-[#d7ffce] to-[#fafff6] text-gray-800;
+  background: linear-gradient(to above, #fafff6, #d7ffce);
+  color: #4b5563; /* text-gray-800 */
   font-family: 'Poppins', sans-serif;
 }
 
-/* Hide native date input calendar icon when we provide our own trigger */
+/* Hilangkan icon default date */
 .no-native-date-icon::-webkit-calendar-picker-indicator {
   opacity: 0;
   display: none;
