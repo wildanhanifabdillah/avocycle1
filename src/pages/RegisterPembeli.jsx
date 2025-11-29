@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
-
 import Brand from "../components/Brand";
 import Field, { Label } from "../components/Field";
 import Button from "../components/Button";
+import useAuth from "../hooks/useAuth";
 
-export default function Register() {
+export default function RegisterPembeli() {
   const navigate = useNavigate();
-  const { registerPetani, loading } = useAuth();
+  const { registerPembeli, loading } = useAuth();
 
   const [form, setForm] = useState({
     full_name: "",
@@ -45,10 +44,10 @@ export default function Register() {
       password: form.password,
       phone: form.phone,
       auth_provider: "Local",
-      role: "Petani",
+      role: "Pembeli",
     };
 
-    const res = await registerPetani(payload);
+    const res = await registerPembeli(payload);
 
     if (!res.success) {
       return alert(res.error || "Registrasi gagal.");
@@ -58,32 +57,29 @@ export default function Register() {
     navigate("/login");
   };
 
+
   return (
     <div>
       <Brand />
 
       <h1 className="text-[40px] leading-none sm:text-5xl font-extrabold mb-8">
-        Register Petani
+        Register Pembeli
       </h1>
 
-      <form onSubmit={handleSubmit} className="max-w-xl">
-        {/* NAMA */}
+      <form className="max-w-xl" onSubmit={handleSubmit}>
         <div className="mb-5">
-          <Label htmlFor="full_name">Nama Lengkap</Label>
+          <Label>Nama Lengkap</Label>
           <Field
-            id="full_name"
             type="text"
             placeholder="Nama Lengkap"
-            value={form.full_name}
+            value={form.name}
             onChange={handleChange}
           />
         </div>
 
-        {/* EMAIL */}
         <div className="mb-5">
-          <Label htmlFor="email">E-mail</Label>
+          <Label>Email</Label>
           <Field
-            id="email"
             type="email"
             placeholder="example@gmail.com"
             value={form.email}
@@ -91,11 +87,9 @@ export default function Register() {
           />
         </div>
 
-        {/* PASSWORD */}
         <div className="mb-5">
-          <Label htmlFor="password">Password</Label>
+          <Label>Password</Label>
           <Field
-            id="password"
             type="password"
             placeholder="Password"
             value={form.password}
@@ -103,23 +97,19 @@ export default function Register() {
           />
         </div>
 
-        {/* CONFIRM PASSWORD */}
         <div className="mb-5">
-          <Label htmlFor="confirm">Konfirmasi Password</Label>
+          <Label>Konfirmasi Password</Label>
           <Field
-            id="confirm"
             type="password"
             placeholder="Konfirmasi Password"
-            value={form.confirm}
+            value={form.confirmPassword}
             onChange={handleChange}
           />
         </div>
 
-        {/* PHONE */}
-        <div className="mb-7">
-          <Label htmlFor="phone">No. Telp</Label>
+        <div className="mb-5">
+          <Label>No. Telp</Label>
           <Field
-            id="phone"
             type="tel"
             placeholder="08xxxxx"
             value={form.phone}
@@ -127,12 +117,11 @@ export default function Register() {
           />
         </div>
 
-        {/* BUTTON REGISTER */}
         <Button type="submit" disabled={loading}>
           {loading ? "Loading..." : "Register"}
         </Button>
 
-        <p className="mt-6 text-sm items-center justify-center flex gap-1">
+        <p className="mt-6 text-sm flex items-center justify-center gap-1">
           Sudah punya akun?
           <Link to="/login" className="text-brand-700 hover:underline">
             Masuk

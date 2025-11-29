@@ -1,22 +1,25 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthService from "../services/AuthService";
 
 export default function GoogleCallback() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.hash.substring(1));
+    const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
-    const user = params.get("user");
+    const name = params.get("name");
+    const email = params.get("email");
 
-    if (token && user) {
-      AuthService.saveSession(token, JSON.parse(user));
+    if (token) {
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify({ fullName: name, email }));
+
       navigate("/dashboard");
     } else {
       navigate("/login");
     }
-  }, [navigate]);
+  }, 
+);
 
-  return <p>Sedang memproses login...</p>;
+  return <p className="mt-10 text-center">Memproses login Google...</p>;
 }

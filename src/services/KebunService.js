@@ -1,12 +1,25 @@
 import api from "../api/axiosInstance";
-import { ENDPOINTS } from "../api/endpoints";
 
 const KebunService = {
-  getAll: () => api.get(ENDPOINTS.KEBUN),
-  getById: (id) => api.get(`${ENDPOINTS.KEBUN}/${id}`),
-  create: (data) => api.post(ENDPOINTS.KEBUN, data),
-  update: (id, data) => api.put(`${ENDPOINTS.KEBUN}/${id}`, data),
-  remove: (id) => api.delete(`${ENDPOINTS.KEBUN}/${id}`),
+  getAll: async () => {
+    const res = await api.get(`/kebun`);
+    return res.data; // harus array
+  },
+
+  create: async (payload) => {
+    const res = await api.post("/kebun", payload);
+    return res.data;
+  },
+
+  update: async (id, payload) => {
+    const res = await api.put(`/kebun/${id}`, payload);
+    return res.data;
+  },
+
+  delete: async (id) => {
+    const res = await api.delete(`/kebun/${id}`);
+    return res.data;
+  },
 };
 
 export default KebunService;

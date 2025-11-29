@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import GoogleCallback from "./pages/GoogleCallback";
 import ProtectedRoute from "./routes/ProtectedRoutes";
 import "./index.css";
+import RegisterPembeli from "./pages/RegisterPembeli.jsx";
 import App from "./App.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
@@ -14,21 +15,27 @@ import Profile from "./pages/Profile.jsx";
 import PlantDetail from "./pages/PlantDetail.jsx";
 import Monitoring from "./pages/Monitoring.jsx";
 import Report from "./pages/Report.jsx";
+import Kebun from "./pages/Kebun.jsx";
+import RoleSelectionRegister from "./pages/RoleSelectionRegister.jsx";
+import RoleSelectionGoogle from "./pages/RoleSelectionGoogle.jsx";
 
 const router = createBrowserRouter([
-  // Layout login & register (2 panel)
   {
     path: "/",
     element: <App />,
     children: [
       { index: true, element: <Login /> },
       { path: "login", element: <Login /> },
+
+      { path: "register-role", element: <RoleSelectionRegister /> },
+      { path: "login-google", element: <RoleSelectionGoogle /> },
       { path: "register", element: <Register /> },
+      { path: "register-pembeli", element: <RegisterPembeli /> },
+
       { path: "auth/google/callback", element: <GoogleCallback /> },
     ],
   },
 
-  // Layout dashboard Avocycle
   {
     path: "/dashboard",
     element: (
@@ -38,6 +45,7 @@ const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <Dashboard /> },
+      { path: "kebun", element: <Kebun /> },
       { path: "plants", element: <Plants /> },
       { path: "plants/:id", element: <PlantDetail /> },
       { path: "monitoring", element: <Monitoring /> },
@@ -47,12 +55,6 @@ const router = createBrowserRouter([
   },
 ]);
 
-export default function Main() {
-  return <RouterProvider router={router} />;
-}
-
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
     <RouterProvider router={router} />
-  </React.StrictMode>
 );

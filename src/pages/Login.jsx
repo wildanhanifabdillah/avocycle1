@@ -61,10 +61,7 @@ export default function Login() {
         {/* GOOGLE LOGIN */}
         <Button
           type="button"
-          onClick={() =>
-            (window.location.href =
-              "http://localhost:2005/api/v1" + ENDPOINTS.GOOGLE_PETANI)
-          }
+          onClick={() => navigate("/login-google")}
         >
           <FcGoogle size={24} />
           <span>Sign in with Google</span>
@@ -75,7 +72,7 @@ export default function Login() {
           <a href="#" className="text-brand-700 hover:underline">
             Forgot Password?
           </a>
-          <a href="/register" className="text-brand-700 hover:underline">
+          <a href="/register-role" className="text-brand-700 hover:underline">
             Register
           </a>
         </div>
