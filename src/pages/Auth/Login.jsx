@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
-import { ENDPOINTS } from "../api/endpoints";
-import Brand from "../components/Brand";
-import Field, { Label } from "../components/Field";
-import Button from "../components/Button";
-import Divider from "../components/Divider";
+import useAuth from "../../hooks/useAuth";
+import { ENDPOINTS } from "../../api/endpoints";
+import Brand from "../../components/Brand";
+import Field, { Label } from "../../components/Field";
+import Button from "../../components/Button";
+import Divider from "../../components/Divider";
+
 import { FcGoogle } from "react-icons/fc";
 
 export default function Login() {

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FaRegCalendarAlt } from "react-icons/fa";
 
-export default function EditFaseBerbungaModal({
+export default function EditFasePanenModal({
   open,
   onClose,
   onSave,
@@ -9,19 +9,27 @@ export default function EditFaseBerbungaModal({
 }) {
   const [form, setForm] = useState({
     date: "",
-    munculBunga: "",
-    pecahBunga: "",
-    pentilPertama: "",
+    jumlahPanen: "",
+    jumlahSampel: "",
+    beratTotal: "",
+    catatan: "",
+    fotoPanen: "",
+    fotoFile: null,
   });
+
   const dateRef = useRef(null);
 
   useEffect(() => {
     if (!open) return;
+
     setForm({
       date: initialData?.date || "",
-      munculBunga: initialData?.munculBunga || "",
-      pecahBunga: initialData?.pecahBunga || "",
-      pentilPertama: initialData?.pentilPertama || "",
+      jumlahPanen: initialData?.jumlahPanen || "",
+      jumlahSampel: initialData?.jumlahSampel || "",
+      beratTotal: initialData?.beratTotal || "",
+      catatan: initialData?.catatan || "",
+      fotoPanen: initialData?.fotoPanen || "",
+      fotoFile: null,
     });
   }, [open, initialData]);
 
@@ -29,7 +37,7 @@ export default function EditFaseBerbungaModal({
     setForm((p) => ({ ...p, [k]: e.target.value }));
 
   const handleDate = (e) => {
-    const v = e.target.value; // yyyy-mm-dd
+    const v = e.target.value;
     if (!v) return;
     const [y, m, d] = v.split("-");
     setForm((p) => ({ ...p, date: `${d}/${m}/${y}` }));
@@ -48,29 +56,29 @@ export default function EditFaseBerbungaModal({
 
       <div className="relative z-10 w-full max-w-lg bg-white rounded-lg shadow-2xl">
         <div className="px-6 py-4 border-b">
-          <h3 className="text-lg font-semibold">Fase Berbunga</h3>
+          <h3 className="text-lg font-semibold">Fase Panen</h3>
         </div>
 
         <div className="px-6 py-4 space-y-4">
-          {/* date */}
+          {/* Tanggal Panen */}
           <div>
-            <label className="block text-sm mb-1">Tanggal muncul:</label>
+            <label className="block text-sm mb-1">Tanggal Panen:</label>
             <div className="relative">
               <input
                 type="text"
                 value={form.date}
                 onChange={update("date")}
                 placeholder="DD/MM/YYYY"
-                className="w-full border rounded-md pl-3 pr-10 py-2 text-sm"
+                className="w-full border rounded-md py-2 pl-3 pr-10 text-sm"
               />
               <input
-                ref={dateRef}
                 type="date"
+                ref={dateRef}
                 className="absolute opacity-0 pointer-events-none"
                 onChange={handleDate}
               />
               <FaRegCalendarAlt
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-green-600 cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-green-600"
                 onClick={() =>
                   dateRef.current?.showPicker
                     ? dateRef.current.showPicker()
@@ -80,34 +88,64 @@ export default function EditFaseBerbungaModal({
             </div>
           </div>
 
+          {/* Jumlah Panen */}
           <div>
-            <label className="block text-sm mb-1">Muncul bunga:</label>
+            <label className="block text-sm mb-1">Jumlah Panen:</label>
             <input
               type="text"
-              value={form.munculBunga}
-              onChange={update("munculBunga")}
+              value={form.jumlahPanen}
+              onChange={update("jumlahPanen")}
               className="w-full border rounded-md px-3 py-2 text-sm"
             />
           </div>
 
+          {/* Jumlah Sampel */}
           <div>
-            <label className="block text-sm mb-1">Pecah bunga:</label>
+            <label className="block text-sm mb-1">Jumlah Sampel:</label>
             <input
               type="text"
-              value={form.pecahBunga}
-              onChange={update("pecahBunga")}
+              value={form.jumlahSampel}
+              onChange={update("jumlahSampel")}
               className="w-full border rounded-md px-3 py-2 text-sm"
             />
           </div>
 
+          {/* Berat Total */}
           <div>
-            <label className="block text-sm mb-1">Pentil buah pertama:</label>
+            <label className="block text-sm mb-1">Berat Total (kg):</label>
             <input
               type="text"
-              value={form.pentilPertama}
-              onChange={update("pentilPertama")}
+              value={form.beratTotal}
+              onChange={update("beratTotal")}
               className="w-full border rounded-md px-3 py-2 text-sm"
             />
+          </div>
+
+          {/* Catatan */}
+          <div>
+            <label className="block text-sm mb-1">Catatan:</label>
+            <textarea
+              value={form.catatan}
+              onChange={update("catatan")}
+              className="w-full border rounded-md px-3 py-2 text-sm"
+            />
+          </div>
+
+          {/* Foto Panen */}
+          <div>
+            <label className="block text-sm mb-1">Foto Panen (opsional):</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null;
+                setForm((p) => ({ ...p, fotoFile: file, fotoPanen: file?.name || "" }));
+              }}
+              className="w-full border rounded-md px-3 py-2 text-sm"
+            />
+            {form.fotoPanen && (
+              <p className="text-xs text-gray-500 mt-1">Dipilih: {form.fotoPanen}</p>
+            )}
           </div>
         </div>
 

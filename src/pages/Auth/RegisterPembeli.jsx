@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import Brand from "../components/Brand";
-import Field, { Label } from "../components/Field";
-import Button from "../components/Button";
-import useAuth from "../hooks/useAuth";
+import Brand from "../../components/Brand";
+import Field, { Label } from "../../components/Field";
+import Button from "../../components/Button";
+import useAuth from "../../hooks/useAuth";
 
 export default function RegisterPembeli() {
   const navigate = useNavigate();

@@ -33,11 +33,11 @@ export default function Sidebar({ open }) {
                 icon: <FaTree />,
                 path: "/dashboard/kebun",
               },
-              {
-                name: "Manajemen Pohon",
-                icon: <FaLeaf />,
-                path: "/dashboard/plants",
-              },
+              // {
+              //   name: "Manajemen Pohon",
+              //   icon: <FaLeaf />,
+              //   path: "/dashboard/plants",
+              // },
             ],
           },
           {

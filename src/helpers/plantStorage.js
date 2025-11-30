@@ -43,7 +43,9 @@ export function addPlant(plant) {
   list.push(item);
   savePlants(list);
   // notify listeners
-  try { window.dispatchEvent(new Event("plants:changed")); } catch {}
+  try { window.dispatchEvent(new Event("plants:changed")); } catch {
+    // ignore
+  }
   return item;
 }
 
@@ -59,7 +61,9 @@ export function updatePlant(id, updates) {
   const merged = { ...list[idx], ...updates, updatedAt: new Date().toISOString() };
   list[idx] = merged;
   savePlants(list);
-  try { window.dispatchEvent(new Event("plants:changed")); } catch {}
+  try { window.dispatchEvent(new Event("plants:changed")); } catch {
+    // ignore
+  }
   return merged;
 }
 

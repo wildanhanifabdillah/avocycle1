@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { FaEdit, FaPlus, FaTrash } from "react-icons/fa";
 import useKebun from "../hooks/useKebun";
 import AddKebunModal from "./Modals/AddKebunModal";
@@ -19,39 +20,57 @@ export default function Kebun() {
     setOpenAdd,
     setOpenEdit,
   } = useKebun();
+  const navigate = useNavigate();
 
   return (
     <div className="relative max-w-3xl mx-auto space-y-4 p-4">
 
-      {kebun.map((item) => (
-        <div
-          key={item.id}
-          className="bg-white border-t-4 border-green-500 rounded-xl shadow p-4 flex justify-between"
-        >
-          <div>
-            <h2 className="text-xl font-bold">{item.nama_kebun}</h2>
-            <p className="text-sm text-gray-600">MDPL: {item.mdpl} mdpl</p>
-          </div>
+      {kebun.map((item) => {
+        const kebunId =
+          item?.id ??
+          item?.ID ??
+          item?.id_kebun ??
+          item?.KebunID ??
+          item?.kebunId ??
+          null;
 
-          <div className="flex items-start gap-4 text-gray-600">
-            <FaEdit
-              className="cursor-pointer hover:text-green-600"
-              onClick={() => {
-                setSelectedKebun(item);
-                setOpenEdit(true);
-              }}
-            />
+        return (
+          <div
+            key={kebunId || item.id || item.nama_kebun}
+            onClick={() => {
+              if (!kebunId) return;
+              navigate(`/dashboard/kebun/${kebunId}/plants`);
+            }}
+            className="bg-white border-t-4 border-green-500 rounded-xl shadow p-4 flex justify-between"
+          >
+            <div>
+              <h2 className="text-xl font-bold">{item.nama_kebun}</h2>
+              <p className="text-sm text-gray-600">MDPL: {item.mdpl} mdpl</p>
+            </div>
 
-            <FaTrash
-              className="cursor-pointer hover:text-red-600"
-              onClick={async () => {
-                await KebunService.delete(item.id);
-                fetchKebun();
-              }}
-            />
+            <div className="flex items-start gap-4 text-gray-600">
+              <FaEdit
+                className="cursor-pointer hover:text-green-600"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedKebun(item);
+                  setOpenEdit(true);
+                }}
+              />
+
+              <FaTrash
+                className="cursor-pointer hover:text-red-600"
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  if (!kebunId) return;
+                  await KebunService.delete(kebunId);
+                  fetchKebun();
+                }}
+              />
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
 
     {/* Pagination Clean */}
     <div className="flex justify-center items-center gap-3 pt-4">

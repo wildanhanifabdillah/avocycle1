@@ -1,7 +1,7 @@
-import Brand from "../components/Brand";
-import Button from "../components/Button";
-import { ENDPOINTS } from "../api/endpoints";
-import api from "../api/axiosInstance";
+import Brand from "../../components/Brand";
+import Button from "../../components/Button";
+import { ENDPOINTS } from "../../api/endpoints";
+import api from "../../api/axiosInstance";
 
 export default function RoleSelectionGoogle() {
   const API_BASE = api.defaults?.baseURL || "";

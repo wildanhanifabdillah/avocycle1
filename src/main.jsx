@@ -1,13 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import GoogleCallback from "./pages/GoogleCallback";
+import GoogleCallback from "./pages/Auth/GoogleCallback";
 import ProtectedRoute from "./routes/ProtectedRoutes";
 import "./index.css";
-import RegisterPembeli from "./pages/RegisterPembeli.jsx";
+import RegisterPembeli from "./pages/Auth/RegisterPembeli.jsx";
 import App from "./App.jsx";
-import Login from "./pages/Login.jsx";
-import Register from "./pages/Register.jsx";
+import Login from "./pages/Auth/Login.jsx";
+import Register from "./pages/Auth/Register.jsx";
 import DashboardLayout from "./layouts/DashboardLayout.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Plants from "./pages/Plants.jsx";
@@ -16,8 +16,8 @@ import PlantDetail from "./pages/PlantDetail.jsx";
 import Monitoring from "./pages/Monitoring.jsx";
 import Report from "./pages/Report.jsx";
 import Kebun from "./pages/Kebun.jsx";
-import RoleSelectionRegister from "./pages/RoleSelectionRegister.jsx";
-import RoleSelectionGoogle from "./pages/RoleSelectionGoogle.jsx";
+import RoleSelectionRegister from "./pages/Auth/RoleSelectionRegister.jsx";
+import RoleSelectionGoogle from "./pages/Auth/RoleSelectionGoogle.jsx";
 
 const router = createBrowserRouter([
   {
@@ -46,6 +46,8 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Dashboard /> },
       { path: "kebun", element: <Kebun /> },
+      { path: "kebun/:kebunId/plants", element: <Plants /> },
+      { path: "kebun/:kebunId/plants/:id", element: <PlantDetail /> },
       { path: "plants", element: <Plants /> },
       { path: "plants/:id", element: <PlantDetail /> },
       { path: "monitoring", element: <Monitoring /> },

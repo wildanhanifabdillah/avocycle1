@@ -1,5 +1,5 @@
-import Brand from "../components/Brand";
-import Button from "../components/Button";
+import Brand from "../../components/Brand";
+import Button from "../../components/Button";
 import { useNavigate } from "react-router-dom";
 
 export default function RoleSelectionRegister() {
