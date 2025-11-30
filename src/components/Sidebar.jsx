@@ -17,14 +17,14 @@ export default function Sidebar({ open }) {
     {
       title: "Manajemen Tanaman",
       items: [
-        { name: "Manajemen Pohon", icon: <FaLeaf />, path: "/dashboard/plants" },
+        { name: "Manajemen Pohon", icon: <FaLeaf />, path: "/kebun" },
       ],
     },
     {
       title: "Deteksi Penyakit",
       items: [
-        { name: "Monitoring Penyakit", icon: <FaBug />, path: "/dashboard/monitoring" },
-        { name: "Laporan Penyakit", icon: <FaClipboardList />, path: "/dashboard/report" },
+        { name: "Monitoring Penyakit", icon: <FaBug />, path: "/monitoring" },
+        { name: "Laporan Penyakit", icon: <FaClipboardList />, path: "/report" },
       ],
     },
   ];
