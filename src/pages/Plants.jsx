@@ -1,173 +1,195 @@
-// src/pages/Plants.jsx
-import { Link } from "react-router-dom";
-import { FaEdit, FaPlus } from "react-icons/fa";
+import { useState } from "react";
+import { FaEye, FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import { Link, useParams } from "react-router-dom";
+import usePlants from "../hooks/usePlants";
+import { monthsDiff, estimate, healthClass } from "../helpers/plantUtils";
+
 import AddPlantModal from "./Modals/AddPlantModal";
 import EditPlantModal from "./Modals/EditPlantModal";
-import usePlants from "../hooks/usePlants";
+import DeletePlantModal from "./Modals/DeletePlantModal";
 
 export default function Plants() {
+  const { kebunId: kebunIdParam } = useParams();
+  const kebunId =
+    kebunIdParam && kebunIdParam !== "undefined" && kebunIdParam !== "null"
+      ? kebunIdParam
+      : null;
   const {
-    current,
-    totalPages,
-    healthPillClass,
-    formatDMY,
-    addDays,
-    monthsDiffFrom,
-    phasesMap,
-
-    openModal,
-    openEditPlant,
-    selectedPlant,
+    plants,
+    loading,
+    error,
     page,
-
+    meta,
     setPage,
-    setOpenModal,
-    setOpenEditPlant,
-    setSelectedPlant,
-  } = usePlants();
+    reload,
+    deletePlant,
+  } = usePlants(kebunId);
+
+  const [openAdd, setOpenAdd] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [deleting, setDeleting] = useState(null);
+
+  const totalPages = meta.total_pages ?? 1;
+
+  if (!kebunId || kebunId === "undefined" || kebunId === "null") {
+    return (
+      <div>
+        <h1 className="text-xl font-semibold mb-4">Tanaman di Kebun</h1>
+        <p className="text-gray-600">
+          Pilih kebun dari daftar kebun untuk melihat tanamannya.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="relative">
+    <div>
+      <h1 className="text-xl font-semibold mb-4">Tanaman di Kebun {kebunId}</h1>
 
-      {/* Daftar Tanaman */}
+      {loading && <p className="text-gray-500">Memuat data...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+
       <div className="flex flex-col gap-4">
-        {current.map((plant) => (
+        {plants.map((p) => (
           <div
-            key={plant.id}
-            className="bg-white border-t-4 border-green-400 rounded-xl shadow-md flex justify-between items-stretch p-4 hover:shadow-lg transition max-w-4xl w-full mx-auto h-40"
+            key={p.id}
+            className="relative bg-white border-t-4 border-green-400 rounded-xl shadow-md hover:shadow-lg transition p-4 max-w-4xl w-full mx-auto"
           >
-            <div className="flex items-stretch gap-4 h-full">
-              <img
-                src={plant.image || "/avocado1.png"}
-                alt={plant.code}
-                className="w-28 h-full object-cover rounded-lg"
-              />
-
-              <div>
-                <div className="flex items-center gap-3">
-                  <h2 className="text-xl font-semibold">{plant.code}</h2>
-                  <span
-                    className={`px-3 py-0.5 rounded-full text-xs font-medium ${healthPillClass(
-                      plant.health
-                    )}`}
-                  >
-                    {plant.health || "Sehat"}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-6 text-sm text-[#8C8C8C]">
-                  <span className="inline-flex items-center gap-2">
-                    <img src="/icons/calendar.svg" className="w-5 h-5" />
-                    {monthsDiffFrom(plant.date)} bulan
-                  </span>
-
-                  <span className="inline-flex items-center gap-2">
-                    <img src="/icons/growth.svg" className="w-5 h-5" />
-                    {phasesMap[plant.id] || plant.phase}
-                  </span>
-                </div>
-
-                <div className="mt-1 text-sm text-[#8C8C8C]">
-                  <p>
-                    Jenis:{" "}
-                    {plant.type === "mentega"
-                      ? "Alpukat Mentega"
-                      : plant.type === "miki"
-                      ? "Alpukat Miki"
-                      : "-"}
-                  </p>
-
-                  <p>Tanggal Tanam: {formatDMY(plant.date)}</p>
-
-                  <p>
-                    Estimasi Panen:{" "}
-                    {(() => {
-                      const est = addDays(plant.date, plant.period);
-                      return est ? formatDMY(est.toISOString()) : "-";
-                    })()}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col h-full items-end justify-between py-1">
+            <div className="absolute right-3 top-3 flex items-center gap-3 text-[20px]">
               <FaEdit
                 className="text-gray-400 hover:text-green-600 cursor-pointer"
-                onClick={() => {
-                  setSelectedPlant(plant);
-                  setOpenEditPlant(true);
-                }}
+                onClick={() => setEditing(p)}
+              />
+              <FaTrash
+                className="text-red-400 hover:text-red-600 cursor-pointer"
+                onClick={() => setDeleting(p)}
+              />
+            </div>
+
+            <div className="flex gap-5 h-full items-center">
+              <img
+                src={p.image}
+                className="w-28 h-28 object-cover rounded-lg flex-shrink-0"
               />
 
-              <Link
-                to={`/dashboard/plants/${plant.id}`}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow text-sm mt-auto"
-              >
-                Lihat Detail
-              </Link>
+              <div className="flex-1 flex items-center justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-xl font-semibold">{p.code}</h2>
+                    <span className={`px-3 py-1 text-xs rounded-full ${healthClass(p.health)}`}>
+                      {p.health}
+                    </span>
+                  </div>
+
+                  <div className="text-sm text-gray-600 flex gap-6 mt-1">
+                    <span className="flex gap-2 items-center">
+                      <img src="/icons/calendar.svg" alt="" className="w-4 h-4" /> {monthsDiff(p.date)} bulan
+                    </span>
+                    <span className="flex gap-2 items-center">
+                      <img src="/icons/growth.svg" alt="" className="w-4 h-4" /> {p.phase}
+                    </span>
+                  </div>
+
+                  <div className="mt-2 text-sm text-gray-700 space-y-1">
+                    <p>
+                      Jenis:{" "}
+                      {p.type === "mentega"
+                        ? "Alpukat Mentega"
+                        : p.type === "miki"
+                        ? "Alpukat Miki"
+                        : "-"}
+                    </p>
+                    <p>Tanggal tanam: {p.fmtDate}</p>
+                    <p>Estimasi panen: {estimate(p.date, p.period)}</p>
+                  </div>
+                </div>
+
+                <Link
+                  to={`/dashboard/kebun/${kebunId}/plants/${p.id}`}
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow text-sm whitespace-nowrap"
+                >
+                  Lihat Detail
+                </Link>
+              </div>
             </div>
           </div>
         ))}
       </div>
 
       {/* Pagination */}
-      <div className="mt-6 flex items-center justify-center gap-3">
-        <button
-          className="px-2 py-1 text-gray-700 hover:text-green-700 disabled:opacity-40"
-          disabled={page === 1}
-          onClick={() => setPage(page - 1)}
-        >
-          &lt;
+      <div className="mt-6 flex justify-center gap-3">
+        <button disabled={page <= 1} onClick={() => setPage(page - 1)}>
+          {"<"}
         </button>
 
-        {Array.from({ length: totalPages }).slice(0, 3).map((_, i) => {
-          const n = i + 1;
-          return (
-            <button
-              key={n}
-              onClick={() => setPage(n)}
-              className={`h-8 w-8 rounded-full border text-sm ${
-                page === n
-                  ? "bg-green-600 text-white border-green-600"
-                  : "border-gray-300 text-gray-700 hover:border-green-500"
-              }`}
-            >
-              {n}
-            </button>
-          );
-        })}
+        {[...Array(totalPages)].map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setPage(i + 1)}
+            className={`px-3 py-1 rounded-full ${
+              page === i + 1 ? "bg-green-600 text-white" : "bg-gray-200"
+            }`}
+          >
+            {i + 1}
+          </button>
+        ))}
 
-        {totalPages > 3 && (
-          <span className="px-1 text-gray-500">…</span>
-        )}
-
-        <button
-          className="px-2 py-1 text-gray-700 hover:text-green-700 disabled:opacity-40"
-          disabled={page === totalPages}
-          onClick={() => setPage(page + 1)}
-        >
-          &gt;
+        <button disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
+          {">"}
         </button>
       </div>
 
-      {/* Floating Add Button */}
+      {/* FAB Add Button */}
       <button
-        onClick={() => setOpenModal(true)}
-        className="fixed bottom-8 right-8 bg-green-600 hover:bg-green-700 text-white p-4 rounded-full shadow-lg transition transform hover:scale-110"
+        onClick={() => setOpenAdd(true)}
+        className="fixed bottom-8 right-8 bg-green-600 text-white p-4 rounded-full shadow-lg"
       >
         <FaPlus size={22} />
       </button>
 
-      {/* Modals */}
-      {openEditPlant && (
-        <EditPlantModal
-          initialData={selectedPlant}
-          onClose={() => setOpenEditPlant(false)}
+      {openAdd && (
+        <AddPlantModal
+          kebunId={kebunId}
+          onClose={() => setOpenAdd(false)}
+          onSuccess={() => {
+            reload(page);
+            setOpenAdd(false);
+          }}
         />
       )}
 
-      {openModal && (
-        <AddPlantModal onClose={() => setOpenModal(false)} />
+      {editing && (
+        <EditPlantModal
+          open={!!editing}
+          kebunId={kebunId}
+          initialData={{
+            id: editing?.id,
+            name: editing?.nama_tanaman || editing?.name,
+            type: editing?.type,
+            date: editing?.date,
+            period: editing?.period,
+            code: editing?.code,
+            block: editing?.kode_blok || editing?.block,
+            kebunId: kebunId,
+          }}
+          onClose={() => setEditing(null)}
+          onSave={() => {
+            reload(page);
+            setEditing(null);
+          }}
+        />
+      )}
+
+      {deleting && (
+        <DeletePlantModal
+          plant={deleting}
+          onClose={() => setDeleting(null)}
+          onConfirm={async () => {
+            await deletePlant(deleting.id);
+            setDeleting(null);
+            reload(page);
+          }}
+        />
       )}
     </div>
   );
