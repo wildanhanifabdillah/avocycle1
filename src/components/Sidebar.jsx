@@ -7,17 +7,83 @@ export default function Sidebar({ open }) {
   const [active, setActive] = useState(location.pathname);
   const [role, setRole] = useState(null);
 
+  const normalizeRole = (val) => {
+    if (!val) return null;
+    const raw = val.toString().trim();
+
+    // Handle numeric role ids (e.g., 1 = petani, 2 = pembeli)
+    if (/^\d+$/.test(raw)) {
+      if (raw === "1") return "petani";
+      if (raw === "2") return "pembeli";
+    }
+
+    const str = raw.toLowerCase();
+    return str.replace(/^role[_-\s]?/, "");
+  };
+
+  const extractRole = (user) => {
+    if (!user) return null;
+
+    const candidates = [
+      user.role,
+      user.Role,
+      user.role_name,
+      user.roleName,
+      user.RoleName,
+      user.role_type,
+      user.roleType,
+      user.RoleType,
+      user.role_id,
+      user.roleId,
+      user.RoleId,
+      user.role?.name,
+      user.role?.RoleName,
+      user.role?.role_name,
+      user.role?.role_id,
+      user.data?.role,
+      user.data?.role_name,
+      user.data?.role_id,
+      user.profile?.role,
+      user.profile?.role_name,
+      user.profile?.role_id,
+      Array.isArray(user.roles) ? user.roles[0] : null,
+    ];
+
+    for (const c of candidates) {
+      const normalized = normalizeRole(c?.name ?? c);
+      if (normalized) return normalized;
+    }
+
+    return null;
+  };
+
   useEffect(() => {
     const raw = localStorage.getItem("user");
-    if (raw) {
+    if (!raw) return;
+
+    try {
       const u = JSON.parse(raw);
-      setRole(u.role || u.Role || null);
+      const detected = extractRole(u);
+      setRole(detected);
+    } catch (e) {
+      console.error("Failed to read role from localStorage.user", e);
+      const fallback = normalizeRole(raw);
+      if (fallback) setRole(fallback);
     }
   }, []);
 
+  useEffect(() => {
+    setActive(location.pathname);
+  }, [location.pathname]);
+
+  const isPetani = role?.includes("petani");
+
+  const isActive = (path) =>
+    active === path || active.startsWith(`${path}/`);
+
   // Menu dynamic based on role
   const menuGroups =
-    role === "Petani"
+    isPetani
       ? [
           {
             title: "Dashboard",
@@ -31,7 +97,7 @@ export default function Sidebar({ open }) {
               {
                 name: "Manajemen Kebun",
                 icon: <FaTree />,
-                path: "/dashboard/kebun",
+                path: "/kebun",
               },
               // {
               //   name: "Manajemen Pohon",
@@ -46,12 +112,12 @@ export default function Sidebar({ open }) {
               {
                 name: "Monitoring Penyakit",
                 icon: <FaBug />,
-                path: "/dashboard/monitoring",
+                path: "/monitoring",
               },
               {
                 name: "Laporan Penyakit",
                 icon: <FaClipboardList />,
-                path: "/dashboard/report",
+                path: "/report",
               },
             ],
           },
@@ -63,7 +129,7 @@ export default function Sidebar({ open }) {
               {
                 name: "Daftar Tanaman",
                 icon: <FaLeaf />,
-                path: "/dashboard/plants",
+                path: "/plants",
               },
             ],
           },
@@ -92,7 +158,7 @@ export default function Sidebar({ open }) {
                     to={item.path}
                     onClick={() => setActive(item.path)}
                     className={`flex items-center gap-3 px-4 py-2 w-full text-gray-600 hover:bg-green-50 transition ${
-                      active === item.path
+                      isActive(item.path)
                         ? "bg-green-100 text-green-700 font-medium"
                         : ""
                     }`}

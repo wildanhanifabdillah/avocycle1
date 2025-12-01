@@ -2,7 +2,6 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import GoogleCallback from "./pages/Auth/GoogleCallback";
-import ProtectedRoute from "./routes/ProtectedRoutes";
 import "./index.css";
 import RegisterPembeli from "./pages/Auth/RegisterPembeli.jsx";
 import App from "./App.jsx";
@@ -17,7 +16,7 @@ import Monitoring from "./pages/Monitoring.jsx";
 import Report from "./pages/Report.jsx";
 import Kebun from "./pages/Kebun.jsx";
 import RoleSelectionRegister from "./pages/Auth/RoleSelectionRegister.jsx";
-import RoleSelectionGoogle from "./pages/Auth/RoleSelectionGoogle.jsx";
+import ChooseRole from "./pages/Auth/RoleSelectionGoogle.jsx";
 
 const router = createBrowserRouter([
   {
@@ -28,28 +27,23 @@ const router = createBrowserRouter([
       { path: "login", element: <Login /> },
 
       { path: "register-role", element: <RoleSelectionRegister /> },
-      { path: "login-google", element: <RoleSelectionGoogle /> },
       { path: "register", element: <Register /> },
       { path: "register-pembeli", element: <RegisterPembeli /> },
 
       { path: "auth/google/callback", element: <GoogleCallback /> },
+      { path: "auth/google/callback/petani", element: <GoogleCallback /> },
+      { path: "auth/google/choose-role", element: <ChooseRole /> },
     ],
   },
 
   {
-    path: "/dashboard",
-    element: (
-      <ProtectedRoute>
-        <DashboardLayout />
-      </ProtectedRoute>
-    ),
+    element: <DashboardLayout />,
     children: [
       { index: true, element: <Dashboard /> },
+      { path: "plants", element: <Plants /> },
       { path: "kebun", element: <Kebun /> },
       { path: "kebun/:kebunId/plants", element: <Plants /> },
       { path: "kebun/:kebunId/plants/:id", element: <PlantDetail /> },
-      { path: "plants", element: <Plants /> },
-      { path: "plants/:id", element: <PlantDetail /> },
       { path: "monitoring", element: <Monitoring /> },
       { path: "profile", element: <Profile /> },
       { path: "report", element: <Report /> },
@@ -58,5 +52,7 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
     <RouterProvider router={router} />
+  </React.StrictMode>
 );
