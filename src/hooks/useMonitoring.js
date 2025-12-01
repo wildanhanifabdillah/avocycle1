@@ -16,6 +16,7 @@ export default function useMonitoring() {
   const [preview, setPreview] = useState(null);
   const [analysis, setAnalysis] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [isDetecting, setIsDetecting] = useState(false);
 
   // Upload & select
   const [file, setFile] = useState(null);
@@ -61,25 +62,26 @@ export default function useMonitoring() {
       });
 
       setPlants(normalized);
-
-      // auto select first plant
-      if (normalized.length > 0 && !selectedPlant && normalized[0].id) {
-        setSelectedPlant(String(normalized[0].id));
-      }
     } catch (err) {
       console.error("Error load plants:", err);
       setPlants([]);
     }
-  }, [selectedPlant]);
+  }, []);
 
   // 2) Load riwayat penyakit
-  const loadHistory = useCallback(async () => {
+  const loadHistory = useCallback(async (plantId) => {
+    if (!plantId) {
+      setHistory([]);
+      return;
+    }
+
     try {
-      const data = await MonitoringService.getHistory();
+      const data = await MonitoringService.getHistoryByPlant(plantId);
       const normalized = (data || []).map(normalizeHistory);
       setHistory(normalized);
     } catch (err) {
       console.error("Error load history:", err);
+      setHistory([]);
     }
   }, []);
 
@@ -104,6 +106,8 @@ export default function useMonitoring() {
       return;
     }
 
+    setIsDetecting(true);
+
     try {
       const res = await MonitoringService.classify(file, selectedPlant);
 
@@ -121,12 +125,14 @@ export default function useMonitoring() {
       }); // backend return {nama_penyakit, deskripsi, ...}
 
       setModalOpen(false);
-      loadHistory();
+      loadHistory(selectedPlant);
 
       setFile(null);
     } catch (err) {
       console.error("Error classify:", err);
       alert("Gagal mendeteksi penyakit.");
+    } finally {
+      setIsDetecting(false);
     }
   };
 
@@ -145,7 +151,7 @@ export default function useMonitoring() {
     try {
       await MonitoringService.saveLog(payload);
 
-      loadHistory();
+      loadHistory(selectedPlant);
 
       setAnalysis(null);
       setPreview(null);
@@ -158,14 +164,18 @@ export default function useMonitoring() {
   // INIT
   useEffect(() => {
     loadPlants();
-    loadHistory();
-  }, [loadPlants, loadHistory]);
+  }, [loadPlants]);
+
+  useEffect(() => {
+    loadHistory(selectedPlant);
+  }, [selectedPlant, loadHistory]);
 
   return {
     preview,
     analysis,
     history,
     modalOpen,
+    isDetecting,
 
     plants,
     selectedPlant,

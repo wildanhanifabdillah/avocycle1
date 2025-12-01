@@ -3,28 +3,32 @@ import { ENDPOINTS } from "../api/endpoints";
 
 const AuthService = {
   login: async (email, password) => {
-  const res = await api.post(ENDPOINTS.LOGIN, { email, password });
+    const res = await api.post(ENDPOINTS.LOGIN, { email, password });
 
-  const token =
-    res.data.token ||
-    res.data.jwtToken ||
-    res.data.accessToken;
+    const token =
+      res.data.token ||
+      res.data.jwtToken ||
+      res.data.accessToken;
 
-  const user =
-    res.data.data ||
-    res.data.user ||
-    res.data.profile;
+    let user =
+      res.data.data ||
+      res.data.user ||
+      res.data.profile;
 
-  if (!token) {
-    throw new Error("Token tidak ditemukan di respon API");
-  }
+    if (user && res.data?.role && !user.role && !user.Role) {
+      user = { ...user, role: res.data.role };
+    }
 
-  // Simpan session
-  localStorage.setItem("token", token);
-  localStorage.setItem("user", JSON.stringify(user));
+    if (!token) {
+      throw new Error("Token tidak ditemukan di respon API");
+    }
 
-  return { token, user };
-},
+    // Simpan session
+    localStorage.setItem("token", token);
+    if (user) localStorage.setItem("user", JSON.stringify(user));
+
+    return { token, user };
+  },
 
 
   registerPetani: async (payload) => {

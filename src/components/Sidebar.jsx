@@ -2,60 +2,60 @@ import { useLocation, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { FaLeaf, FaBug, FaClipboardList, FaTree } from "react-icons/fa";
 
+const normalizeRole = (val) => {
+  if (!val) return null;
+  const raw = val.toString().trim();
+
+  // Handle numeric role ids (e.g., 1 = petani, 2 = pembeli)
+  if (/^\d+$/.test(raw)) {
+    if (raw === "1") return "petani";
+    if (raw === "2") return "pembeli";
+  }
+
+  const str = raw.toLowerCase();
+  return str.replace(/^role[_-\s]?/, "");
+};
+
+const extractRole = (user) => {
+  if (!user) return null;
+
+  const candidates = [
+    user.role,
+    user.Role,
+    user.role_name,
+    user.roleName,
+    user.RoleName,
+    user.role_type,
+    user.roleType,
+    user.RoleType,
+    user.role_id,
+    user.roleId,
+    user.RoleId,
+    user.role?.name,
+    user.role?.RoleName,
+    user.role?.role_name,
+    user.role?.role_id,
+    user.data?.role,
+    user.data?.role_name,
+    user.data?.role_id,
+    user.profile?.role,
+    user.profile?.role_name,
+    user.profile?.role_id,
+    Array.isArray(user.roles) ? user.roles[0] : null,
+  ];
+
+  for (const c of candidates) {
+    const normalized = normalizeRole(c?.name ?? c);
+    if (normalized) return normalized;
+  }
+
+  return null;
+};
+
 export default function Sidebar({ open }) {
   const location = useLocation();
   const [active, setActive] = useState(location.pathname);
   const [role, setRole] = useState(null);
-
-  const normalizeRole = (val) => {
-    if (!val) return null;
-    const raw = val.toString().trim();
-
-    // Handle numeric role ids (e.g., 1 = petani, 2 = pembeli)
-    if (/^\d+$/.test(raw)) {
-      if (raw === "1") return "petani";
-      if (raw === "2") return "pembeli";
-    }
-
-    const str = raw.toLowerCase();
-    return str.replace(/^role[_-\s]?/, "");
-  };
-
-  const extractRole = (user) => {
-    if (!user) return null;
-
-    const candidates = [
-      user.role,
-      user.Role,
-      user.role_name,
-      user.roleName,
-      user.RoleName,
-      user.role_type,
-      user.roleType,
-      user.RoleType,
-      user.role_id,
-      user.roleId,
-      user.RoleId,
-      user.role?.name,
-      user.role?.RoleName,
-      user.role?.role_name,
-      user.role?.role_id,
-      user.data?.role,
-      user.data?.role_name,
-      user.data?.role_id,
-      user.profile?.role,
-      user.profile?.role_name,
-      user.profile?.role_id,
-      Array.isArray(user.roles) ? user.roles[0] : null,
-    ];
-
-    for (const c of candidates) {
-      const normalized = normalizeRole(c?.name ?? c);
-      if (normalized) return normalized;
-    }
-
-    return null;
-  };
 
   useEffect(() => {
     const raw = localStorage.getItem("user");
@@ -78,8 +78,10 @@ export default function Sidebar({ open }) {
 
   const isPetani = role?.includes("petani");
 
-  const isActive = (path) =>
-    active === path || active.startsWith(`${path}/`);
+  const isActive = (path) => {
+    if (path === "/dashboard") return active === "/dashboard";
+    return active === path || active.startsWith(`${path}/`);
+  };
 
   // Menu dynamic based on role
   const menuGroups =

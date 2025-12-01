@@ -39,7 +39,7 @@ export default function Kebun() {
             key={kebunId || item.id || item.nama_kebun}
             onClick={() => {
               if (!kebunId) return;
-              navigate(`/dashboard/kebun/${kebunId}/plants`);
+              navigate(`/kebun/${kebunId}/plants`);
             }}
             className="bg-white border-t-4 border-green-500 rounded-xl shadow p-4 flex justify-between"
           >

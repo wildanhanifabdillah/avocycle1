@@ -33,6 +33,14 @@ const MonitoringService = {
   },
 
   /**
+   * 3b) Ambil log penyakit berdasarkan tanaman
+   */
+  getHistoryByPlant: async (plantId) => {
+    const res = await api.get(`/Log-Penyakit-Tanaman/Tanaman/${plantId}`);
+    return res.data.data || [];
+  },
+
+  /**
    * 4) Ambil list tanaman
    */
   getPlants: async () => {

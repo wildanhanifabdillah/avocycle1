@@ -103,7 +103,7 @@ export default function Plants() {
 
             <div className="flex items-center justify-end mt-4">
               <Link
-                to={`/dashboard/kebun/${kebunId}/plants/${p.id}`}
+                to={`/kebun/${kebunId}/plants/${p.id}`}
                 className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow text-sm"
               >
                 Lihat Detail

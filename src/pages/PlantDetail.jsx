@@ -425,27 +425,57 @@ export default function PlantDetail() {
 
       {/* RIWAYAT PENYAKIT */}
       <div className="bg-white rounded-xl shadow-md p-6">
-        <h3 className="font-semibold mb-4 text-gray-700">Riwayat Penyakit</h3>
-        <table className="w-full text-sm">
-          <thead>
-            <tr>
-              <th>Tanggal</th>
-              <th>Komponen</th>
-              <th>Penyakit</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {safePlant.diseaseHistory.map((row, i) => (
-              <tr key={i} className="border-t">
-                <td className="py-3">{row.date}</td>
-                <td>{row.component}</td>
-                <td>{row.disease}</td>
-                <td>{row.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold text-gray-700">Riwayat Penyakit</h3>
+          <span className="text-xs text-gray-500">
+            Kode pohon: <span className="font-semibold text-gray-700">{safePlant.code}</span>
+          </span>
+        </div>
+
+        {safePlant.diseaseHistory.length === 0 ? (
+          <p className="text-sm text-gray-500 italic">Belum ada riwayat.</p>
+        ) : (
+          <div className="border rounded-xl overflow-hidden">
+            <div className="grid grid-cols-4 bg-green-50 text-gray-700 font-semibold text-sm px-4 py-3 border-b">
+              <span>Tanggal</span>
+              <span>Kode Pohon</span>
+              <span>Penyakit</span>
+              <span className="text-right">Status</span>
+            </div>
+
+            <div className="divide-y divide-gray-200">
+              {safePlant.diseaseHistory.map((row, i) => {
+                const statusText = (row.status || "-").toString();
+                const lowered = statusText.toLowerCase();
+                const isRecovered =
+                  lowered.includes("sembuh") || lowered.includes("sehat");
+                const statusClass = isRecovered
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-700";
+
+                return (
+                  <div
+                    key={i}
+                    className="grid grid-cols-4 items-center text-sm px-4 py-3"
+                  >
+                    <span className="text-gray-700">{row.date || "-"}</span>
+                    <span className="font-semibold text-gray-800">
+                      {row.component || safePlant.code || "-"}
+                    </span>
+                    <span className="text-gray-700">{row.disease || "-"}</span>
+                    <span className="flex justify-end">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${statusClass}`}
+                      >
+                        {statusText}
+                      </span>
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ====== MODALS ====== */}

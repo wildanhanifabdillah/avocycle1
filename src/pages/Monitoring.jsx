@@ -6,6 +6,7 @@ export default function Monitoring() {
     analysis,
     history,
     modalOpen,
+    isDetecting,
     plants,
     selectedPlant,
     setSelectedPlant,
@@ -111,40 +112,50 @@ export default function Monitoring() {
           Riwayat Deteksi Penyakit
         </h3>
 
-        <div className="border rounded-xl p-4 bg-green-50">
-          <div className="grid grid-cols-4 font-semibold text-gray-600 border-b pb-2 mb-2 text-sm">
-            <p>Tanggal</p>
-            <p>Penyakit</p>
-            <p>Kondisi</p>
-            <p>Status</p>
-          </div>
-
-          {history.length > 0 ? (
-            history.map((item, i) => (
-              <div key={i} className="grid grid-cols-4 text-sm py-1">
-                <p>{formatDate(item.created_at)}</p>
-                <p>{item.nama_penyakit}</p>
-                <p>{item.kondisi}</p>
-                <p className="text-red-600">
-                  {item.kondisi?.toLowerCase() === "sembuh" ? "Sehat" : "Sakit"}
-                </p>
+        {!selectedPlant ? (
+          <p className="text-gray-500 text-sm">
+            Pilih tanaman terlebih dahulu untuk melihat riwayat deteksi.
+          </p>
+        ) : (
+          <>
+            <div className="border rounded-xl p-4 bg-green-50">
+              <div className="grid grid-cols-4 font-semibold text-gray-600 border-b pb-2 mb-2 text-sm">
+                <p>Tanggal</p>
+                <p>Penyakit</p>
+                <p>Kondisi</p>
+                <p>Status</p>
               </div>
-            ))
-          ) : (
-            <p className="text-gray-500 text-sm">Belum ada riwayat</p>
-          )}
-        </div>
 
-        <div className="flex justify-end mt-4">
-          {analysis && (
-            <button
-              onClick={saveToHistory}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700"
-            >
-              Simpan Hasil
-            </button>
-          )}
-        </div>
+              {history.length > 0 ? (
+                history.map((item, i) => (
+                  <div key={i} className="grid grid-cols-4 text-sm py-1">
+                    <p>{formatDate(item.created_at)}</p>
+                    <p>{item.nama_penyakit}</p>
+                    <p>{item.kondisi}</p>
+                    <p className="text-red-600">
+                      {item.kondisi?.toLowerCase() === "sembuh"
+                        ? "Sehat"
+                        : "Sakit"}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm">Belum ada riwayat</p>
+              )}
+            </div>
+
+            <div className="flex justify-end mt-4">
+              {analysis && (
+                <button
+                  onClick={saveToHistory}
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700"
+                >
+                  Simpan Hasil
+                </button>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Modal */}
@@ -166,9 +177,10 @@ export default function Monitoring() {
 
             <button
               onClick={detectDisease}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg shadow"
+              disabled={isDetecting}
+              className={`w-full text-white py-3 rounded-lg shadow transition ${isDetecting ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
             >
-              Klik untuk Deteksi Penyakit
+              {isDetecting ? "Memproses..." : "Klik untuk Deteksi Penyakit"}
             </button>
           </div>
         </div>

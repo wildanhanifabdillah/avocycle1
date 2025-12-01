@@ -7,6 +7,8 @@ export const ENDPOINTS = {
   GOOGLE_PEMBELI: "/auth/google/pembeli",
   GOOGLE_CALLBACK_PETANI: "/auth/google/callback/petani",
   GOOGLE_CALLBACK_PEMBELI: "/auth/google/callback/pembeli",
+  GOOGLE_COMPLETE_PETANI: "/auth/google/complete/petani",
+  GOOGLE_COMPLETE_PEMBELI: "/auth/google/complete/pembeli",
 
   // Kebun
   KEBUN: "/kebun",

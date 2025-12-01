@@ -118,6 +118,40 @@ export default function usePlantDetail(id) {
         const plantedDateObj = plantedIso ? new Date(plantedIso) : null;
         const periodDays = Number(meta?.period || masaProduksi || 0);
         const ageMonths = plantedIso ? monthsDiffFrom(plantedIso) : 0;
+        const codeValue = meta?.code || kodeTanaman || `Tanaman #${id}`;
+
+        const resolveLogDate = (log) => {
+          const candidates = [
+            log.created_at,
+            log.createdAt,
+            log.CreatedAt,
+            log.created_at?.Time,
+            log.createdAt?.Time,
+            log.CreatedAt?.Time,
+            log.tanggal,
+            log.Tanggal,
+            log.tanggal_log,
+            log.TanggalLog,
+            log.tanggal_deteksi,
+            log.tanggalDeteksi,
+            log.tanggal_pemeriksaan,
+            log.tanggalPemeriksaan,
+            log.updated_at,
+            log.updatedAt,
+            log.UpdatedAt,
+            log.updated_at?.Time,
+            log.updatedAt?.Time,
+            log.UpdatedAt?.Time,
+          ];
+
+          for (const cand of candidates) {
+            if (!cand) continue;
+            const val = typeof cand === "object" && cand.Time ? cand.Time : cand;
+            const parsed = new Date(val);
+            if (!Number.isNaN(parsed)) return parsed;
+          }
+          return null;
+        };
 
         // fetch disease logs
         let diseaseHistory = [];
@@ -129,12 +163,11 @@ export default function usePlantDetail(id) {
               log.tanaman?.KodeTanaman ??
               kodeTanaman ??
               `Tanaman #${id}`;
-            const dateStr = log.created_at ?? log.createdAt ?? "";
-            const d = dateStr ? new Date(dateStr) : null;
+            const d = resolveLogDate(log);
             const dateLabel = d && !Number.isNaN(d) ? fmtDMY(d) : "-";
             return {
               date: dateLabel,
-              component: kode,
+              component: codeValue || kode,
               disease: log.penyakit?.nama_penyakit ?? log.nama_penyakit ?? "-",
               status: log.kondisi ?? log.status ?? "-",
             };
@@ -145,7 +178,7 @@ export default function usePlantDetail(id) {
 
         const plantView = {
           id: raw.ID ?? raw.id ?? id,
-          code: meta?.code || kodeTanaman || `Tanaman #${id}`,
+          code: codeValue,
           name: namaTanaman,
           block: kodeBlok,
           kebunId,

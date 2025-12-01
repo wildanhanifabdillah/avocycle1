@@ -39,7 +39,7 @@ const router = createBrowserRouter([
   {
     element: <DashboardLayout />,
     children: [
-      { index: true, element: <Dashboard /> },
+      { path: "/dashboard", element: <Dashboard /> },
       { path: "plants", element: <Plants /> },
       { path: "kebun", element: <Kebun /> },
       { path: "kebun/:kebunId/plants", element: <Plants /> },
