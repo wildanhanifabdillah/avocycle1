@@ -129,10 +129,7 @@ export default function Login() {
           <span>Sign in with Google</span>
         </Button>
 
-        <div className="mt-6 flex items-center justify-between text-sm">
-          <Link to="#" className="text-brand-700 hover:underline">
-            Forgot Password?
-          </Link>
+        <div className="mt-6 flex items-center justify-end text-sm">
           <Link to="/register-role" className="text-brand-700 hover:underline">
             Register
           </Link>

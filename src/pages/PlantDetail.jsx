@@ -283,37 +283,60 @@ export default function PlantDetail() {
                 ) : phases.berbuah.length === 0 ? (
                   <p className="italic text-sm">Belum ada data.</p>
                 ) : (
-                  <table className="w-full text-sm">
-                    <thead>
+                  <table className="w-full text-sm border-collapse overflow-hidden rounded-lg">
+                    <thead className="bg-green-100 text-gray-700">
                       <tr>
-                        <th className="py-2 px-3">Tanggal Cover</th>
-                        <th className="py-2 px-3">Jumlah Cover</th>
-                        <th className="py-2 px-3">Warna Label</th>
-                        <th className="py-2 px-3">Estimasi Panen</th>
+                        <th className="py-2 px-3 text-left">Tanggal Cover</th>
+                        <th className="py-2 px-3 text-left">Jumlah Cover</th>
+                        <th className="py-2 px-3 text-left">Warna Label</th>
+                        <th className="py-2 px-3 text-left">Estimasi Panen</th>
                         <th className="py-2 px-3 text-center">Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {phases.berbuah.map((row, i) => (
-                        <tr key={i} className="border-t">
-                          <td className="py-3 px-3 text-center">{row.date}</td>
-                          <td className="py-3 px-3 text-center">{row.cover}</td>
-                          <td className="py-3 px-3 text-center">{row.labelColor}</td>
-                          <td className="py-3 px-3 text-center">{row.estimasi}</td>
-                          <td className="py-3 px-3 text-center">
-                            <button
-                              className="px-2 py-1 text-xs border rounded hover:bg-gray-50 flex items-center gap-1 mx-auto"
-                              onClick={() => {
-                                setEditingFruit(row);
-                                setOpenFruitModal(true);
-                              }}
-                            >
-                              <FaEdit className="inline-block" />
-                              Edit
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                      {phases.berbuah.map((row, i) => {
+                        const colorLower = (row.labelColor || "").toString().toLowerCase();
+                        const dotColor =
+                          colorLower.includes("merah")
+                            ? "#ef4444"
+                            : colorLower.includes("kuning")
+                            ? "#f59e0b"
+                            : "#22c55e";
+                        const rowBg =
+                          colorLower.includes("merah")
+                            ? "bg-red-100"
+                            : colorLower.includes("kuning")
+                            ? "bg-yellow-100"
+                            : "bg-green-50";
+                        return (
+                          <tr key={i} className={`${rowBg} border-t border-gray-200`}>
+                            <td className="py-3 px-3">{row.date || "-"}</td>
+                            <td className="py-3 px-3">{row.cover}</td>
+                            <td className="py-3 px-3">
+                              <span className="inline-flex items-center gap-2">
+                                <span
+                                  className="inline-block w-3 h-3 rounded-full border border-white shadow"
+                                  style={{ backgroundColor: dotColor }}
+                                />
+                                {row.labelColor || "-"}
+                              </span>
+                            </td>
+                            <td className="py-3 px-3">{row.estimasi || "-"}</td>
+                            <td className="py-3 px-3 text-center">
+                              <button
+                                className="px-2 py-1 text-xs border rounded hover:bg-gray-50 flex items-center gap-1 mx-auto"
+                                onClick={() => {
+                                  setEditingFruit(row);
+                                  setOpenFruitModal(true);
+                                }}
+                              >
+                                <FaEdit className="inline-block" />
+                                Edit
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 )}

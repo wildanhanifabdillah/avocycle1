@@ -31,4 +31,11 @@ export const ENDPOINTS = {
 
   // Deteksi Penyakit (Petani/Admin)
   DETEKSI_PENYAKIT: "/petamin/penyakit",
+
+  // Dashboard
+  DASHBOARD_COUNT_POHON: "/petani/count-all-tanaman",
+  DASHBOARD_COUNT_SAKIT: "/petani/count-tanaman-sakit",
+  DASHBOARD_COUNT_SIAP_PANEN: "/petani/count-tanaman-siap-panen",
+  DASHBOARD_CHART_PANEN: "/petani/count-tanaman-tiap-minggu",
+
 };

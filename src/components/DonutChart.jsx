@@ -1,13 +1,15 @@
 import { PieChart, Pie, Cell, Legend } from "recharts";
 
-const data = [
-  { name: "Sehat", value: 65 },
-  { name: "Sakit", value: 35 },
-];
+const COLORS = ["#16a34a", "#ef4444"];
 
-const COLORS = ["#16a34a", "#818cf8"];
+export default function DonutChart({ healthy = 0, sick = 0 }) {
+  const data = [
+    { name: "Sehat", value: healthy },
+    { name: "Sakit", value: sick },
+  ];
 
-export default function DonutChart() {
+  const total = healthy + sick;
+
   return (
     <div className="bg-white rounded-xl shadow-md p-4 w-full">
       <h3 className="text-gray-700 mb-4 font-medium">Perbandingan Kesehatan Pohon</h3>
@@ -26,6 +28,9 @@ export default function DonutChart() {
         </Pie>
         <Legend />
       </PieChart>
+      <p className="text-center text-sm text-gray-500 mt-2">
+        Total: <span className="font-semibold text-gray-700">{total}</span>
+      </p>
     </div>
   );
 }

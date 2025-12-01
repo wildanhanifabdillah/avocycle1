@@ -36,7 +36,7 @@ export default function EditFaseBerbungaModal({
   };
 
   const handleSave = () => {
-    onSave?.(form);
+    onSave?.({ ...form, id: initialData?.id });
     onClose?.();
   };
 

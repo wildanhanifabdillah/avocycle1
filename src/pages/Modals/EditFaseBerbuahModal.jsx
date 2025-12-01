@@ -10,7 +10,7 @@ export default function EditFaseBerbuahModal({
   const [form, setForm] = useState({
     date: "",
     cover: "",
-    labelColor: "",
+    labelColor: "Merah",
   });
 
   const dateRef = useRef(null);
@@ -19,7 +19,7 @@ export default function EditFaseBerbuahModal({
     setForm({
       date: initialData?.date || "",
       cover: initialData?.cover || "",
-      labelColor: initialData?.labelColor || "",
+      labelColor: initialData?.labelColor || "Merah",
     });
   }, [open, initialData]);
 
@@ -39,7 +39,7 @@ export default function EditFaseBerbuahModal({
   };
 
   const handleSave = () => {
-    onSave?.(form);
+    onSave?.({ ...form, id: initialData?.id });
     onClose?.();
   };
 
@@ -88,12 +88,15 @@ export default function EditFaseBerbuahModal({
           {/* Warna Label */}
           <div>
             <label className="block text-sm mb-1">Warna Label:</label>
-            <input
-              type="text"
+            <select
               value={form.labelColor}
               onChange={update("labelColor")}
-              className="w-full border rounded-md px-3 py-2 text-sm"
-            />
+              className="w-full border rounded-md px-3 py-2 text-sm bg-white"
+            >
+              <option value="Merah">Merah</option>
+              <option value="Kuning">Kuning</option>
+              <option value="Hijau">Hijau</option>
+            </select>
           </div>
         </div>
 

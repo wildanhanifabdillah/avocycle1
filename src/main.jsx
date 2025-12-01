@@ -10,7 +10,6 @@ import Register from "./pages/Auth/Register.jsx";
 import DashboardLayout from "./layouts/DashboardLayout.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Plants from "./pages/Plants.jsx";
-import Profile from "./pages/Profile.jsx";
 import PlantDetail from "./pages/PlantDetail.jsx";
 import Monitoring from "./pages/Monitoring.jsx";
 import Report from "./pages/Report.jsx";
@@ -45,7 +44,6 @@ const router = createBrowserRouter([
       { path: "kebun/:kebunId/plants", element: <Plants /> },
       { path: "kebun/:kebunId/plants/:id", element: <PlantDetail /> },
       { path: "monitoring", element: <Monitoring /> },
-      { path: "profile", element: <Profile /> },
       { path: "report", element: <Report /> },
     ],
   },

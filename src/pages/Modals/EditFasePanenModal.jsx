@@ -44,7 +44,7 @@ export default function EditFasePanenModal({
   };
 
   const handleSave = () => {
-    onSave?.(form);
+    onSave?.({ ...form, id: initialData?.id });
     onClose?.();
   };
 

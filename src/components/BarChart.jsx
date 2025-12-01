@@ -1,15 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 
-const data = [
-  { name: "Minggu 1", jumlah: 120 },
-  { name: "Minggu 2", jumlah: 200 },
-  { name: "Minggu 3", jumlah: 150 },
-  { name: "Minggu 4", jumlah: 90 },
-  { name: "Minggu 5", jumlah: 180 },
-  { name: "Minggu 6", jumlah: 130 },
-];
-
-export default function BarChartComponent() {
+export default function BarChartComponent({ data = [] }) {
   return (
     <div className="bg-white rounded-xl shadow-md p-4 w-full">
       <h3 className="text-gray-700 mb-4 font-medium">Jumlah Panen per Minggu</h3>

@@ -460,7 +460,10 @@ export default function usePlantDetail(id) {
           tanaman_id: Number(id),
         };
 
-        const res = await FaseService.createBerbunga(payload);
+        const isEdit = Boolean(created?.id);
+        const res = isEdit
+          ? await FaseService.updateBerbunga(created.id, payload)
+          : await FaseService.createBerbunga(payload);
         const saved = res?.data ?? res ?? payload;
 
         const rawDate =
@@ -471,7 +474,7 @@ export default function usePlantDetail(id) {
           if (!isNaN(d)) iso = d.toISOString().slice(0, 10);
         }
 
-        const createdId = saved.ID ?? saved.id ?? Date.now();
+        const createdId = saved.ID ?? saved.id ?? created?.id ?? Date.now();
         const view = {
           id: createdId,
           backend: saved,
@@ -518,7 +521,10 @@ export default function usePlantDetail(id) {
           tanaman_id: Number(id),
         };
 
-        const res = await FaseService.createBerbuah(payload);
+        const isEdit = Boolean(created?.id);
+        const res = isEdit
+          ? await FaseService.updateBerbuah(created.id, payload)
+          : await FaseService.createBerbuah(payload);
         const saved = res?.data ?? res ?? payload;
 
         const tanggalCover =
@@ -534,7 +540,7 @@ export default function usePlantDetail(id) {
           if (!isNaN(d)) iso = d.toISOString().slice(0, 10);
         }
 
-        const createdId = saved.ID ?? saved.id ?? Date.now();
+        const createdId = saved.ID ?? saved.id ?? created?.id ?? Date.now();
         const view = {
           id: createdId,
           backend: saved,
@@ -573,7 +579,10 @@ export default function usePlantDetail(id) {
           foto_panen: created?.fotoFile || undefined,
         };
 
-        const res = await FaseService.createPanen(payload);
+        const isEdit = Boolean(created?.id);
+        const res = isEdit
+          ? await FaseService.updatePanen(created.id, payload)
+          : await FaseService.createPanen(payload);
         const saved = res?.data ?? res ?? payload;
 
         const rawDate =
@@ -588,7 +597,7 @@ export default function usePlantDetail(id) {
           if (!isNaN(d)) iso = d.toISOString().slice(0, 10);
         }
 
-        const createdId = saved.ID ?? saved.id ?? Date.now();
+        const createdId = saved.ID ?? saved.id ?? created?.id ?? Date.now();
         const view = {
           id: createdId,
           backend: saved,
