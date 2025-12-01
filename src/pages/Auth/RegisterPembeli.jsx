@@ -18,8 +18,10 @@ export default function RegisterPembeli() {
   });
 
   const handleChange = (e) => {
-    const { id, value } = e.target;
-    setForm({ ...form, [id]: value });
+    const { id, name, value } = e.target;
+    const key = name || id;
+    if (!key) return;
+    setForm({ ...form, [key]: value });
   };
 
   const handleSubmit = async (e) => {
@@ -72,7 +74,9 @@ export default function RegisterPembeli() {
           <Field
             type="text"
             placeholder="Nama Lengkap"
-            value={form.name}
+            id="full_name"
+            name="full_name"
+            value={form.full_name}
             onChange={handleChange}
           />
         </div>
@@ -82,6 +86,8 @@ export default function RegisterPembeli() {
           <Field
             type="email"
             placeholder="example@gmail.com"
+            id="email"
+            name="email"
             value={form.email}
             onChange={handleChange}
           />
@@ -92,6 +98,8 @@ export default function RegisterPembeli() {
           <Field
             type="password"
             placeholder="Password"
+            id="password"
+            name="password"
             value={form.password}
             onChange={handleChange}
           />
@@ -102,7 +110,9 @@ export default function RegisterPembeli() {
           <Field
             type="password"
             placeholder="Konfirmasi Password"
-            value={form.confirmPassword}
+            id="confirm"
+            name="confirm"
+            value={form.confirm}
             onChange={handleChange}
           />
         </div>
@@ -112,6 +122,8 @@ export default function RegisterPembeli() {
           <Field
             type="tel"
             placeholder="08xxxxx"
+            id="phone"
+            name="phone"
             value={form.phone}
             onChange={handleChange}
           />

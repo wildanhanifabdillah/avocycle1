@@ -1,6 +1,6 @@
 // src/pages/auth/Login.jsx
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Brand from "../../components/Brand.jsx";
 import Field, { Label } from "../../components/Field.jsx";
 import Divider from "../../components/Divider.jsx";
@@ -17,34 +17,6 @@ export default function Login() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  const [googleRole, setGoogleRole] = useState("pembeli");
-
-  const normalizeRole = (val) => {
-    if (!val) return "";
-    const raw = val.toString().toLowerCase();
-    if (raw.includes("petani") || raw === "1") return "petani";
-    if (raw.includes("pembeli") || raw === "2") return "pembeli";
-    return raw;
-  };
-
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("user");
-      if (!stored) return;
-      const parsed = JSON.parse(stored);
-      const role =
-        normalizeRole(parsed?.role) ||
-        normalizeRole(parsed?.Role) ||
-        normalizeRole(parsed?.role_name) ||
-        normalizeRole(parsed?.roleName) ||
-        normalizeRole(parsed?.role_id) ||
-        normalizeRole(parsed?.roleId) ||
-        normalizeRole(parsed?.data?.role);
-      if (role) setGoogleRole(role.includes("petani") ? "petani" : "pembeli");
-    } catch (e) {
-      console.warn("Failed to read stored user role", e);
-    }
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -70,14 +42,10 @@ export default function Login() {
 
       localStorage.setItem("token", token);
 
-      let userPayload = data?.data?.user || data?.user || null;
-      if (!userPayload && data?.data && typeof data.data === "object") {
-        userPayload = data.data;
+      const userPayload = data?.data?.user || data?.user || null;
+      if (userPayload) {
+        localStorage.setItem("user", JSON.stringify(userPayload));
       }
-      if (userPayload && data?.role && !userPayload.role && !userPayload.Role) {
-        userPayload = { ...userPayload, role: data.role };
-      }
-      if (userPayload) localStorage.setItem("user", JSON.stringify(userPayload));
 
       navigate("/dashboard");
     } catch (err) {
@@ -94,9 +62,6 @@ export default function Login() {
   };
 
   const handleGoogleLogin = () => {
-    const role = googleRole === "petani" ? "petani" : "pembeli";
-    const endpoint =
-      role === "petani" ? ENDPOINTS.GOOGLE_PETANI : ENDPOINTS.GOOGLE_PEMBELI;
     /**
      * Flow:
      * 1) FE redirect ke BE: /api/v1/auth/google/pembeli (atau petani, bebas default)
@@ -109,7 +74,7 @@ export default function Login() {
      *  - /auth/google/callback  → GoogleCallback.jsx
      *  - /auth/google/choose-role → RoleSelectionGoogle.jsx
      */
-    window.location.href = `${API_BASE}${endpoint}`;
+    window.location.href = `${API_BASE}${ENDPOINTS.GOOGLE_PEMBELI}`;
     // kalau mau default-nya petani: pakai ENDPOINTS.GOOGLE_PETANI
   };
 

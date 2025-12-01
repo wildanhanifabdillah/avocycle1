@@ -26,8 +26,33 @@ export default function GoogleCallback() {
     }
 
     try {
+      // 🔎 Decode JWT untuk cek role di console
+      try {
+        const [, payloadPart] = token.split(".");
+        if (payloadPart) {
+          // JWT pakai base64url, jadi perlu ganti -_ ke +/
+          const normalized = payloadPart.replace(/-/g, "+").replace(/_/g, "/");
+          const decoded = atob(normalized);
+          const payload = JSON.parse(decoded);
+
+          const role =
+            payload.role ||
+            payload.Role ||
+            payload.user_role ||
+            "(role tidak ditemukan di token)";
+          // console.log("✅ Google login success — current role:", role);
+        } else {
+          console.warn("JWT payload part not found");
+        }
+      } catch (e) {
+        console.warn("Gagal decode JWT untuk baca role:", e);
+      }
+
+      // simpan token seperti biasa
       localStorage.setItem("token", token);
-      // kalau mau fetch user, bisa di sini
+
+      // kalau mau, bisa fetch data user di sini
+
       navigate("/dashboard", { replace: true });
     } catch (err) {
       console.error(err);
@@ -36,10 +61,9 @@ export default function GoogleCallback() {
     }
   }, [searchParams, navigate]);
 
-  // ⬇️ Saat loading: jangan render apa-apa (blank)
+  // ⬇️ Saat loading: blank saja
   if (status === "loading") {
     return null;
-    // atau return <></>;
   }
 
   // status === "error"
