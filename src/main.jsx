@@ -13,6 +13,8 @@ import PlantDetail from "./pages/plants/PlantDetail.jsx";
 import Monitoring from "./pages//monitoring/Monitoring.jsx";
 import Report from "./pages/reports/Report.jsx";
 import Kebun from "./pages/kebun/Kebun.jsx";
+import ChooseRole from "./pages/auth/RoleSelectionGoogle.jsx";
+import GoogleCallback from "./pages/auth/GoogleCallback.jsx";
 
 const router = createBrowserRouter([
   // Layout login & register (2 panel)
@@ -23,6 +25,7 @@ const router = createBrowserRouter([
       { index: true, element: <Login /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
+      { path: "auth/google/callback", element: <GoogleCallback /> },
 
     ],
   },
@@ -38,6 +41,7 @@ const router = createBrowserRouter([
     { path: "/monitoring", element: <Monitoring /> },
     { path: "/report", element: <Report /> },
     { path: "/profile", element: <Profile /> },
+    { path: "/auth/google/choose-role", element: <ChooseRole />}
   ],
 },
  

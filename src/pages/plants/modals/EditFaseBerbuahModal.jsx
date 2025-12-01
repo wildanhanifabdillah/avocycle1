@@ -14,7 +14,6 @@ export default function EditFaseBerbuahModal({
     tanggalCover: "",
     jumlahCover: "",
     warnaLabel: "red",
-    estimasiPanen: "",
   });
 
   const [saving, setSaving] = useState(false);
@@ -83,20 +82,12 @@ export default function EditFaseBerbuahModal({
         initialData.labelColor ??
         "red";
 
-      const estimasiPanen =
-        backend.EstimasiPanen ??
-        backend.estimasi_panen ??
-        backend.estimasiPanen ??
-        initialData.estimasi ??
-        "";
-
       setForm({
         mingguKe: String(mingguKe ?? ""),
         tanggalCatat: toYMD(tanggalCatat) || toYMD(tanggalCover),
         tanggalCover: toYMD(tanggalCover),
         jumlahCover: String(jumlahCover ?? ""),
         warnaLabel: warnaLabel || "red",
-        estimasiPanen: toYMD(estimasiPanen),
       });
     } else {
       // mode tambah
@@ -107,7 +98,6 @@ export default function EditFaseBerbuahModal({
         tanggalCover: "",
         jumlahCover: "",
         warnaLabel: "red",
-        estimasiPanen: "",
       });
     }
   }, [open, initialData]);
@@ -129,8 +119,7 @@ export default function EditFaseBerbuahModal({
         tanggal_catat: form.tanggalCatat,       // YYYY-MM-DD
         tanggal_cover: form.tanggalCover,       // YYYY-MM-DD
         jumlah_cover: Number(form.jumlahCover || 0),
-        warna_label: form.warnaLabel,
-        estimasi_panen: form.estimasiPanen,     // YYYY-MM-DD
+        warna_label: form.warnaLabel,  // YYYY-MM-DD
         tanaman_id: Number(plantId),
       };
 
@@ -233,19 +222,6 @@ export default function EditFaseBerbuahModal({
                 type="date"
                 name="tanggalCover"
                 value={form.tanggalCover}
-                onChange={handleChange}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400"
-                required
-              />
-            </div>
-            <div className="flex-1">
-              <label className="block text-sm text-gray-700 mb-1">
-                Estimasi panen
-              </label>
-              <input
-                type="date"
-                name="estimasiPanen"
-                value={form.estimasiPanen}
                 onChange={handleChange}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400"
                 required
