@@ -28,7 +28,7 @@ export default function Navbar({ toggleSidebar }) {
 
       {/* Kanan: profil */}
       <div
-        onClick={() => navigate("/dashboard/profile")}
+        onClick={() => navigate("/profile")}
         className="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center cursor-pointer hover:bg-green-100 transition"
         title="Lihat Profil"
       >
