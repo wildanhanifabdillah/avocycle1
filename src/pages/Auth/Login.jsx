@@ -47,7 +47,39 @@ export default function Login() {
         localStorage.setItem("user", JSON.stringify(userPayload));
       }
 
-      navigate("/dashboard");
+      // Tentukan role untuk redirect
+      const resolveRole = () => {
+        const fromUser =
+          userPayload?.role ||
+          userPayload?.Role ||
+          userPayload?.role_name ||
+          data?.role;
+        if (fromUser) return fromUser;
+
+        try {
+          const [, payloadPart] = token.split(".");
+          if (payloadPart) {
+            const normalized = payloadPart.replace(/-/g, "+").replace(/_/g, "/");
+            const padded = normalized + "===".slice((normalized.length + 3) % 4);
+            const json = atob(padded);
+            const payload = JSON.parse(json);
+            return (
+              payload.role ||
+              payload.Role ||
+              payload.user_role ||
+              payload.userRole ||
+              null
+            );
+          }
+        } catch (err) {
+          console.warn("Failed to decode token role:", err);
+        }
+        return null;
+      };
+
+      const role = resolveRole();
+      const target = role === "Pembeli" ? "/tanaman" : "/dashboard";
+      navigate(target);
     } catch (err) {
       console.error("Login error:", err);
       const msg =

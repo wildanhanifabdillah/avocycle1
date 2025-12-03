@@ -5,7 +5,8 @@ import { formatDMY } from "../utils/date";
 
 const normalizeDate = (value) => {
   if (!value) return "";
-  const d = new Date(value);
+  const v = typeof value === "object" && value.Time ? value.Time : value;
+  const d = new Date(v);
   if (Number.isNaN(d.getTime())) return "";
   return d.toISOString().slice(0, 10);
 };
@@ -70,18 +71,27 @@ const mapBookingItem = (raw) => {
     booking?.pohon ??
     {};
 
-  const plantedDate =
-    normalizeDate(
-      booking?.tanggal_tanam ??
-        booking?.TanggalTanam ??
-        booking?.tanaman_tanggal_tanam ??
-        booking?.tanamanTanggalTanam ??
-        plant?.TanggalTanam ??
-        plant?.tanggal_tanam ??
-        plant?.tanggalTanam ??
-        plant?.planted_at ??
-        plant?.plantedAt
-    ) || "";
+  // meta lokal (dipakai PlantDetail) -> bisa punya date / period
+  let meta = null;
+  const metaKey = plant?.id ? `plant:${plant.id}:meta` : null;
+  if (metaKey) {
+    try {
+      const rawMeta = localStorage.getItem(metaKey);
+      meta = rawMeta ? JSON.parse(rawMeta) : null;
+    } catch {
+      meta = null;
+    }
+  }
+
+  const plantedDate = normalizeDate(
+    booking?.tanggal_tanam ??
+      booking?.tanaman_tanggal_tanam ??
+      plant?.tanggal_tanam ??          // ⬅️ dari API
+      plant?.tanggalTanam ??
+      plant?.planted_at ??
+      plant?.plantedAt ??
+      null
+  ) || "";
 
   const masaProduksi =
     booking?.masa_produksi ??
@@ -90,7 +100,8 @@ const mapBookingItem = (raw) => {
     plant?.MasaProduksi ??
     plant?.masaProduksi ??
     plant?.period ??
-    plant?.periode;
+    plant?.periode ??
+    meta?.period;
 
   const estPanenRaw =
     booking?.estimasi_panen ??
@@ -98,7 +109,10 @@ const mapBookingItem = (raw) => {
     booking?.estimated_harvest ??
     booking?.estimatedHarvest ??
     plant?.estimasi_panen ??
-    plant?.estimasiPanen;
+    plant?.estimasiPanen ??
+    meta?.estimasi ??
+    meta?.estimate ??
+    meta?.estPanen;
 
   const panenActual =
     booking?.tanggal_panen ??
@@ -107,6 +121,15 @@ const mapBookingItem = (raw) => {
     booking?.tanggalPanenAktual ??
     booking?.harvest_date ??
     booking?.harvestDate ??
+    plant?.TanggalPanen ??
+    plant?.tanggal_panen ??
+    plant?.tanggalPanen ??
+    plant?.TanggalPanenAktual ??
+    plant?.tanggal_panen_aktual ??
+    plant?.tanggalPanenAktual ??
+    meta?.panen ??
+    meta?.panenAktual ??
+    meta?.tanggalPanen ??
     estPanenRaw;
 
   const plantId =
@@ -146,7 +169,13 @@ const mapBookingItem = (raw) => {
       plant?.fase ??
       plant?.phase ??
       "Fase Berbuah",
-    harvestDate: panenActual ? formatDMY(panenActual) : "-",
+    harvestDate: panenActual
+      ? formatDMY(panenActual)
+      : estPanenRaw
+      ? formatDMY(estPanenRaw)
+      : plantedDate && masaProduksi
+      ? estimate(plantedDate, masaProduksi)
+      : "-",
     estimateDate:
       estPanenRaw && !Number.isNaN(new Date(estPanenRaw))
         ? formatDMY(estPanenRaw)
@@ -180,7 +209,7 @@ export default function useCart() {
 
     try {
       const res = await BookingService.listByUser(userId);
-      const list = res?.data ?? res ?? [];
+      const list = res?.data ?? res ?? [];        
       setBookings(list.map(mapBookingItem));
     } catch (err) {
       console.error("Fetch booking error:", err);

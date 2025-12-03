@@ -22,8 +22,7 @@ export default function Sidebar({ open }) {
       // base64url -> base64
       const normalized = payloadPart.replace(/-/g, "+").replace(/_/g, "/");
       // tambahin padding kalau perlu
-      const padded =
-        normalized + "===".slice((normalized.length + 3) % 4);
+      const padded = normalized + "===".slice((normalized.length + 3) % 4);
 
       const json = atob(padded);
       return JSON.parse(json);
@@ -36,7 +35,7 @@ export default function Sidebar({ open }) {
   // ambil role dari localStorage.user atau dari JWT token
   useEffect(() => {
     try {
-      // 1️⃣ coba dari localStorage.user
+      // 1) coba dari localStorage.user
       const rawUser = localStorage.getItem("user");
       if (rawUser) {
         const user = JSON.parse(rawUser);
@@ -49,7 +48,7 @@ export default function Sidebar({ open }) {
         }
       }
 
-      // 2️⃣ kalau user belum ada / tidak ada role → coba dari JWT token
+      // 2) kalau user belum ada / tidak ada role -> coba dari JWT token
       const token = localStorage.getItem("token");
       if (token) {
         const payload = decodeJwtPayload(token);
@@ -60,14 +59,6 @@ export default function Sidebar({ open }) {
           if (tokenRole) {
             setRole(tokenRole);
             console.log("[Sidebar] Current role (from token):", tokenRole);
-
-            // OPTIONAL: kalau mau, bisa simpan minimal user ke localStorage
-            // biar konsisten dengan flow lain:
-            // localStorage.setItem(
-            //   "user",
-            //   JSON.stringify({ role: tokenRole, email: payload.email })
-            // );
-
             return;
           }
         }
@@ -87,7 +78,7 @@ export default function Sidebar({ open }) {
       },
       {
         title: "Manajemen Tanaman",
-        items: [{ name: "Manajemen Pohon", icon: <FaLeaf />, path: "/kebun" }],
+        items: [{ name: "Manajemen Kebun", icon: <FaLeaf />, path: "/kebun" }],
       },
       {
         title: "Deteksi Penyakit",
@@ -100,26 +91,25 @@ export default function Sidebar({ open }) {
     []
   );
 
+  const pembeliMenu = useMemo(
+    () => [
+      {
+        title: "Pembeli",
+        items: [
+          { name: "Daftar Tanaman", icon: <FaLeaf />, path: "/tanaman" },
+        ],
+      },
+    ],
+    []
+  );
+
   // filter menu berdasarkan role
   const filteredMenuGroups = useMemo(() => {
-    if (role === "Pembeli") {
-      // hanya Manajemen Pohon
-      const tanamanGroup = menuGroups.find(
-        (g) => g.title === "Manajemen Tanaman"
-      );
-      if (!tanamanGroup) return [];
+    if (role === "Pembeli") return pembeliMenu;
 
-      return [
-        {
-          ...tanamanGroup,
-          items: tanamanGroup.items.filter((item) => item.path === "/kebun"),
-        },
-      ];
-    }
-
-    // default (Petani / role lain / belum ketemu) → semua menu
+    // default (Petani / role lain / belum ketemu) -> semua menu
     return menuGroups;
-  }, [role, menuGroups]);
+  }, [role, menuGroups, pembeliMenu]);
 
   return (
     <aside

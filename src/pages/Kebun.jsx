@@ -23,7 +23,7 @@ export default function Kebun() {
   const navigate = useNavigate();
 
   return (
-    <div className="relative max-w-3xl mx-auto space-y-4 p-4">
+    <div className="relative max-w-5xl mx-auto space-y-6 p-4 sm:p-6">
 
       {kebun.map((item) => {
         const kebunId =
@@ -41,11 +41,18 @@ export default function Kebun() {
               if (!kebunId) return;
               navigate(`/kebun/${kebunId}/plants`);
             }}
-            className="bg-white border-t-4 border-green-500 rounded-xl shadow p-4 flex justify-between"
+            className="bg-white border-t-4 border-green-500 rounded-2xl shadow-md hover:shadow-lg transition p-5 sm:p-6 flex justify-between"
           >
-            <div>
-              <h2 className="text-xl font-bold">{item.nama_kebun}</h2>
-              <p className="text-sm text-gray-600">MDPL: {item.mdpl} mdpl</p>
+            <div className="flex items-center gap-4">
+              <img
+                src="/avocado1.png"
+                alt="Kebun"
+                className="w-24 h-24 rounded-xl object-cover"
+              />
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800">{item.nama_kebun}</h2>
+                <p className="text-base text-gray-600">MDPL: {item.mdpl} mdpl</p>
+              </div>
             </div>
 
             <div className="flex items-start gap-4 text-gray-600">

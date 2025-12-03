@@ -6,7 +6,7 @@ export default function useKebun() {
   const [loading, setLoading] = useState(true);
 
   const [page, setPage] = useState(1);
-  const limit = 5;
+  const limit = 3;
   const [totalPages, setTotalPages] = useState(1);
 
   const [selectedKebun, setSelectedKebun] = useState(null);

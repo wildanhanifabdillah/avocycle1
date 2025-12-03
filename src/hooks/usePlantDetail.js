@@ -238,7 +238,7 @@ export default function usePlantDetail(id) {
       try {
         const token = localStorage.getItem("token");
         const res = await fetch(
-          `http://localhost:2005/api/v1/petani/fase-bunga/tanaman/${id}`,
+          `http://localhost:2005/api/v1/fase-bunga/tanaman/${id}`,
           { headers: token ? { Authorization: `Bearer ${token}` } : undefined }
         );
 
@@ -290,7 +290,7 @@ export default function usePlantDetail(id) {
       try {
         const token = localStorage.getItem("token");
         const res = await fetch(
-          `http://localhost:2005/api/v1/petani/fase-berbuah/tanaman/${id}`,
+          `http://localhost:2005/api/v1/fase-berbuah/tanaman/${id}`,
           { headers: token ? { Authorization: `Bearer ${token}` } : undefined }
         );
 
@@ -343,7 +343,7 @@ export default function usePlantDetail(id) {
       try {
         const token = localStorage.getItem("token");
         const res = await fetch(
-          `http://localhost:2005/api/v1/petani/fase-panen/tanaman/${id}`,
+          `http://localhost:2005/api/v1/fase-panen/tanaman/${id}`,
           { headers: token ? { Authorization: `Bearer ${token}` } : undefined }
         );
 

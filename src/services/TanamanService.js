@@ -24,6 +24,19 @@ const TanamanService = {
     return res.data;
   },
 
+  async listAll(page, perPage) {
+    const hasPagination =
+      typeof page === "number" &&
+      !Number.isNaN(page) &&
+      typeof perPage === "number" &&
+      !Number.isNaN(perPage);
+
+    const res = await api.get("/tanaman", {
+      params: hasPagination ? { page, per_page: perPage } : undefined,
+    });
+    return res.data;
+  },
+
   async detail(id) {
     const res = await api.get(`/tanaman/${id}`);
     return res.data;

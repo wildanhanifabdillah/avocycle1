@@ -11,6 +11,8 @@ import DashboardLayout from "./layouts/DashboardLayout.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Plants from "./pages/Plants.jsx";
 import PlantDetail from "./pages/PlantDetail.jsx";
+import PlantPembeli from "./pages/PlantPembeli.jsx";
+import Keranjang from "./pages/Keranjang.jsx";
 import Monitoring from "./pages/Monitoring.jsx";
 import Report from "./pages/Report.jsx";
 import Kebun from "./pages/Kebun.jsx";
@@ -40,9 +42,12 @@ const router = createBrowserRouter([
     children: [
       { path: "/dashboard", element: <Dashboard /> },
       { path: "plants", element: <Plants /> },
+      { path: "plants/:id", element: <PlantDetail /> },
+      { path: "tanaman", element: <PlantPembeli /> },
       { path: "kebun", element: <Kebun /> },
       { path: "kebun/:kebunId/plants", element: <Plants /> },
       { path: "kebun/:kebunId/plants/:id", element: <PlantDetail /> },
+      { path: "keranjang", element: <Keranjang /> },
       { path: "monitoring", element: <Monitoring /> },
       { path: "report", element: <Report /> },
     ],

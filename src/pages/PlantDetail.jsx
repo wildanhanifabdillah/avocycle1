@@ -1,7 +1,10 @@
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaWhatsapp, FaShoppingCart } from "react-icons/fa";
 
 import usePlantDetail from "../hooks/usePlantDetail";
+import BookingService from "../services/BookingService";
+import CartStatusModal from "../components/CartStatusModal";
 
 // MODAL
 import EditFaseBerbungaModal from "./Modals/EditFaseBerbungaModal";
@@ -11,6 +14,10 @@ import EditPlantModal from "./Modals/EditPlantModal";
 
 export default function PlantDetail() {
   const { id } = useParams();
+  const [role, setRole] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [addingCart, setAddingCart] = useState(false);
+  const [cartModal, setCartModal] = useState({ open: false, success: false, message: "" });
 
   // ====== HOOK BARU ======
   const {
@@ -57,6 +64,91 @@ export default function PlantDetail() {
     handleSavePlant,
   } = usePlantDetail(id);
 
+  const resolveUserFromStorage = () => {
+    try {
+      const rawUser = localStorage.getItem("user");
+      if (rawUser) {
+        const user = JSON.parse(rawUser);
+        const roleVal = user.role || user.Role || user.role_name || null;
+        const idVal =
+          user.id ||
+          user.ID ||
+          user.user_id ||
+          user.userId ||
+          user.UserID ||
+          user.IDUser ||
+          null;
+        return { role: roleVal, userId: idVal };
+      }
+
+      const token = localStorage.getItem("token");
+      if (token) {
+        const parts = token.split(".");
+        if (parts.length === 3) {
+          const payloadPart = parts[1];
+          const normalized = payloadPart.replace(/-/g, "+").replace(/_/g, "/");
+          const padded = normalized + "===".slice((normalized.length + 3) % 4);
+          const json = atob(padded);
+          const payload = JSON.parse(json);
+          const roleVal =
+            payload.role || payload.Role || payload.user_role || null;
+          const idVal =
+            payload.id ||
+            payload.ID ||
+            payload.user_id ||
+            payload.userId ||
+            payload.UserID ||
+            payload.sub ||
+            null;
+          return { role: roleVal, userId: idVal };
+        }
+      }
+    } catch (err) {
+      console.warn("Failed to resolve role/user in PlantDetail:", err);
+    }
+    return { role: null, userId: null };
+  };
+
+  useEffect(() => {
+    const resolved = resolveUserFromStorage();
+    setRole(resolved.role);
+    setUserId(resolved.userId);
+  }, []);
+
+  const isPembeli = role === "Pembeli";
+
+  const handleAddToCart = async () => {
+    if (!safePlant?.id) {
+      setCartModal({ open: true, success: false, message: "ID tanaman tidak ditemukan." });
+      return;
+    }
+    if (!userId) {
+      setCartModal({ open: true, success: false, message: "User tidak ditemukan, silakan login ulang." });
+      return;
+    }
+    try {
+      setAddingCart(true);
+      await BookingService.create({
+        tanaman_id: Number(safePlant.id),
+        user_id: Number(userId),
+      });
+      setCartModal({ open: true, success: true, message: "Pohon berhasil masuk keranjang" });
+    } catch (err) {
+      console.error("Gagal menambah keranjang:", err);
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "Gagal menambahkan ke keranjang.";
+      setCartModal({ open: true, success: false, message: msg });
+    } finally {
+      setAddingCart(false);
+    }
+  };
+
+  const waLink = `https://wa.me/?text=${encodeURIComponent(
+    `Halo, saya tertarik dengan pohon ${safePlant.code || id}.`
+  )}`;
+
   // ================== UI TETAP PERSIS ==================
   return (
     <div className="space-y-6">
@@ -85,12 +177,37 @@ export default function PlantDetail() {
           </div>
         </div>
 
-        <button
-          onClick={() => setOpenEditPlant(true)}
-          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow"
-        >
-          <FaEdit /> Edit Data
-        </button>
+        {!isPembeli ? (
+          <button
+            onClick={() => setOpenEditPlant(true)}
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow"
+          >
+            <FaEdit /> Edit Data
+          </button>
+        ) : (
+          <div className="flex flex-col gap-3 items-start">
+            <a
+              href={waLink}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow"
+            >
+              <FaWhatsapp /> Hubungi via Whatsapp
+            </a>
+            <button
+              onClick={handleAddToCart}
+              disabled={addingCart}
+              className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-white shadow ${
+                addingCart
+                  ? "bg-green-400 cursor-not-allowed"
+                  : "bg-emerald-600 hover:bg-emerald-700"
+              }`}
+            >
+              <FaShoppingCart />
+              {addingCart ? "Menambahkan..." : "Keranjang"}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* SIKLUS PERTUMBUHAN */}
@@ -175,16 +292,18 @@ export default function PlantDetail() {
                 </p>
               </div>
 
-              <button
-                className="p-2 rounded-lg border text-gray-400 hover:text-gray-600 flex items-center gap-1"
-                onClick={() => {
-                  setEditingFlower(null);
-                  setOpenFlowerModal(true);
-                }}
-              >
-                <FaEdit />
-                <span className="text-xs">Tambah</span>
-              </button>
+              {!isPembeli && (
+                <button
+                  className="p-2 rounded-lg border text-gray-400 hover:text-gray-600 flex items-center gap-1"
+                  onClick={() => {
+                    setEditingFlower(null);
+                    setOpenFlowerModal(true);
+                  }}
+                >
+                  <FaEdit />
+                  <span className="text-xs">Tambah</span>
+                </button>
+              )}
             </div>
 
             {expandedPhase === "berbunga" && (
@@ -203,7 +322,7 @@ export default function PlantDetail() {
                         <th className="py-2 px-3">Muncul Bunga</th>
                         <th className="py-2 px-3">Pecah Bunga</th>
                         <th className="py-2 px-3">Pentil Pertama</th>
-                        <th className="py-2 px-3 text-center">Aksi</th>
+                        {!isPembeli && <th className="py-2 px-3 text-center">Aksi</th>}
                       </tr>
                     </thead>
                     <tbody>
@@ -219,18 +338,20 @@ export default function PlantDetail() {
                           <td className="py-3 px-3 text-center">
                             {r.pentilPertama}
                           </td>
-                          <td className="py-3 px-3 text-center">
-                            <button
-                              className="px-2 py-1 text-xs border rounded hover:bg-gray-50 flex items-center gap-1 mx-auto"
-                              onClick={() => {
-                                setEditingFlower(r);
-                                setOpenFlowerModal(true);
-                              }}
-                            >
-                              <FaEdit className="inline-block" />
-                              Edit
-                            </button>
-                          </td>
+                          {!isPembeli && (
+                            <td className="py-3 px-3 text-center">
+                              <button
+                                className="px-2 py-1 text-xs border rounded hover:bg-gray-50 flex items-center gap-1 mx-auto"
+                                onClick={() => {
+                                  setEditingFlower(r);
+                                  setOpenFlowerModal(true);
+                                }}
+                              >
+                                <FaEdit className="inline-block" />
+                                Edit
+                              </button>
+                            </td>
+                          )}
                         </tr>
                       ))}
                     </tbody>
@@ -262,16 +383,18 @@ export default function PlantDetail() {
                 </p>
               </div>
 
-              <button
-                className="p-2 rounded-lg border text-gray-400 hover:text-gray-600 flex items-center gap-1"
-                onClick={() => {
-                  setEditingFruit(null);
-                  setOpenFruitModal(true);
-                }}
-              >
-                <FaEdit />
-                <span className="text-xs">Tambah</span>
-              </button>
+              {!isPembeli && (
+                <button
+                  className="p-2 rounded-lg border text-gray-400 hover:text-gray-600 flex items-center gap-1"
+                  onClick={() => {
+                    setEditingFruit(null);
+                    setOpenFruitModal(true);
+                  }}
+                >
+                  <FaEdit />
+                  <span className="text-xs">Tambah</span>
+                </button>
+              )}
             </div>
 
             {expandedPhase === "berbuah" && (
@@ -290,7 +413,7 @@ export default function PlantDetail() {
                         <th className="py-2 px-3 text-left">Jumlah Cover</th>
                         <th className="py-2 px-3 text-left">Warna Label</th>
                         <th className="py-2 px-3 text-left">Estimasi Panen</th>
-                        <th className="py-2 px-3 text-center">Aksi</th>
+                        {!isPembeli && <th className="py-2 px-3 text-center">Aksi</th>}
                       </tr>
                     </thead>
                     <tbody>
@@ -322,18 +445,20 @@ export default function PlantDetail() {
                               </span>
                             </td>
                             <td className="py-3 px-3">{row.estimasi || "-"}</td>
-                            <td className="py-3 px-3 text-center">
-                              <button
-                                className="px-2 py-1 text-xs border rounded hover:bg-gray-50 flex items-center gap-1 mx-auto"
-                                onClick={() => {
-                                  setEditingFruit(row);
-                                  setOpenFruitModal(true);
-                                }}
-                              >
-                                <FaEdit className="inline-block" />
-                                Edit
-                              </button>
-                            </td>
+                            {!isPembeli && (
+                              <td className="py-3 px-3 text-center">
+                                <button
+                                  className="px-2 py-1 text-xs border rounded hover:bg-gray-50 flex items-center gap-1 mx-auto"
+                                  onClick={() => {
+                                    setEditingFruit(row);
+                                    setOpenFruitModal(true);
+                                  }}
+                                >
+                                  <FaEdit className="inline-block" />
+                                  Edit
+                                </button>
+                              </td>
+                            )}
                           </tr>
                         );
                       })}
@@ -366,16 +491,18 @@ export default function PlantDetail() {
                 </p>
               </div>
 
-              <button
-                className="p-2 rounded-lg border text-gray-400 hover:text-gray-600 flex items-center gap-1"
-                onClick={() => {
-                  setEditingPanen(null);
-                  setOpenPanenModal(true);
-                }}
-              >
-                <FaEdit />
-                <span className="text-xs">Tambah</span>
-              </button>
+              {!isPembeli && (
+                <button
+                  className="p-2 rounded-lg border text-gray-400 hover:text-gray-600 flex items-center gap-1"
+                  onClick={() => {
+                    setEditingPanen(null);
+                    setOpenPanenModal(true);
+                  }}
+                >
+                  <FaEdit />
+                  <span className="text-xs">Tambah</span>
+                </button>
+              )}
             </div>
 
             {expandedPhase === "panen" && (
@@ -394,7 +521,7 @@ export default function PlantDetail() {
                         <th className="py-2 px-3 text-center">Jumlah Panen</th>
                         <th className="py-2 px-3 text-center">Catatan</th>
                         <th className="py-2 px-3 text-center">Foto</th>
-                        <th className="py-2 px-3 text-center">Aksi</th>
+                        {!isPembeli && <th className="py-2 px-3 text-center">Aksi</th>}
                       </tr>
                     </thead>
                     <tbody>
@@ -423,18 +550,20 @@ export default function PlantDetail() {
                               </span>
                             )}
                           </td>
-                          <td className="py-3 px-3 text-center">
-                            <button
-                              className="px-2 py-1 text-xs border rounded hover:bg-gray-50 flex items-center gap-1 mx-auto"
-                              onClick={() => {
-                                setEditingPanen(row);
-                                setOpenPanenModal(true);
-                              }}
-                            >
-                              <FaEdit className="inline-block" />
-                              Edit
-                            </button>
-                          </td>
+                          {!isPembeli && (
+                            <td className="py-3 px-3 text-center">
+                              <button
+                                className="px-2 py-1 text-xs border rounded hover:bg-gray-50 flex items-center gap-1 mx-auto"
+                                onClick={() => {
+                                  setEditingPanen(row);
+                                  setOpenPanenModal(true);
+                                }}
+                              >
+                                <FaEdit className="inline-block" />
+                                Edit
+                              </button>
+                            </td>
+                          )}
                         </tr>
                       ))}
                     </tbody>
@@ -551,7 +680,13 @@ export default function PlantDetail() {
         kebunId={plant?.kebunId}
         onSave={handleSavePlant}
       />
+
+      <CartStatusModal
+        open={cartModal.open}
+        success={cartModal.success}
+        message={cartModal.message}
+        onClose={() => setCartModal((p) => ({ ...p, open: false }))}
+      />
     </div>
   );
 }
-

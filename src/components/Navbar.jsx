@@ -6,6 +6,33 @@ export default function Navbar({ toggleSidebar }) {
   const navigate = useNavigate();
   const [openMenu, setOpenMenu] = useState(false);
   const menuRef = useRef(null);
+  const [role, setRole] = useState(null);
+
+  const resolveRole = () => {
+    try {
+      const rawUser = localStorage.getItem("user");
+      if (rawUser) {
+        const user = JSON.parse(rawUser);
+        return user.role || user.Role || user.role_name || null;
+      }
+
+      const token = localStorage.getItem("token");
+      if (token) {
+        const parts = token.split(".");
+        if (parts.length === 3) {
+          const payloadPart = parts[1];
+          const normalized = payloadPart.replace(/-/g, "+").replace(/_/g, "/");
+          const padded = normalized + "===".slice((normalized.length + 3) % 4);
+          const json = atob(padded);
+          const payload = JSON.parse(json);
+          return payload.role || payload.Role || payload.user_role || null;
+        }
+      }
+    } catch (err) {
+      console.warn("Failed to resolve role in Navbar:", err);
+    }
+    return null;
+  };
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -15,6 +42,10 @@ export default function Navbar({ toggleSidebar }) {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    setRole(resolveRole());
   }, []);
 
   const handleLogout = () => {
@@ -46,26 +77,38 @@ export default function Navbar({ toggleSidebar }) {
         </Link>
       </div>
 
-      {/* Kanan: profil */}
-      <div className="relative" ref={menuRef}>
-        <button
-          onClick={() => setOpenMenu((prev) => !prev)}
-          className="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center cursor-pointer hover:bg-green-100 transition"
-          title="Menu Profil"
-        >
-          <FaUserCircle className="text-gray-600 text-xl" />
-        </button>
-
-        {openMenu && (
-          <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg py-2 z-50">
-            <button
-              onClick={handleLogout}
-              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
-            >
-              Logout
-            </button>
-          </div>
+      {/* Kanan: keranjang (pembeli) + profil */}
+      <div className="flex items-center gap-3">
+        {role === "Pembeli" && (
+          <Link
+            to="/keranjang"
+            className="flex items-center justify-center text-gray-600 hover:text-green-700 transition"
+            title="Keranjang"
+          >
+            <img src="/icons/cart.svg" alt="Keranjang" className="w-7 h-7" />
+          </Link>
         )}
+
+        <div className="relative" ref={menuRef}>
+          <button
+            onClick={() => setOpenMenu((prev) => !prev)}
+            className="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center cursor-pointer hover:bg-green-100 transition"
+            title="Menu Profil"
+          >
+            <FaUserCircle className="text-gray-600 text-xl" />
+          </button>
+
+          {openMenu && (
+            <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg py-2 z-50">
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
